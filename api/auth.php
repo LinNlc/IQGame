@@ -73,8 +73,8 @@ $buildCandidates = static function (?string $env, array $defaults): array {
     return array_keys($candidates);
 };
 
-$usernameFields = $buildCandidates(getenv('FEISHU_USERNAME_FIELD') ?: null, ['用户名', '账号', '登录账号', 'username', 'user', 'User']);
-$passwordFields = $buildCandidates(getenv('FEISHU_PASSWORD_FIELD') ?: null, ['密码', 'password', 'Password', '口令', 'password_hash']);
+$usernameFields = $buildCandidates(getenv('FEISHU_USERNAME_FIELD') ?: null, ['账号', '用户名', '登录账号', 'username', 'user', 'User']);
+$passwordFields = $buildCandidates(getenv('FEISHU_PASSWORD_FIELD') ?: null, ['密码', '口令', 'password', 'Password', 'password_hash']);
 $displayFields = $buildCandidates(getenv('FEISHU_DISPLAY_FIELD') ?: null, array_merge(['姓名', '姓名（必填）', 'name', 'Name'], $usernameFields));
 
 $tenantTokenCache = null;

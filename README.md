@@ -48,6 +48,7 @@
 
 ### 3.3 可调参数（集中）
 - `setup.LoginBG_URL = 'assets/img/封面.jpg'`：登录页背景图。
+- `setup.AppBG_URL = 'assets/img/封面.jpg'`：非登录页面的全局背景图（未设置时回落至 `LoginBG_URL`）。
 - `setup.WM = { opacity, cols, rowHeight, fontSize, color }`：用户名水印全局参数（进入后渲染为全屏网格）。
 
 ### 3.4 埋点与关键节点
@@ -78,6 +79,7 @@
 - 依赖环境变量：
   - `FEISHU_APP_SECRET`（必填，用于换取 tenant_access_token；亦兼容 `LARK_APP_SECRET`/`APP_SECRET`）。
   - 可选覆盖：`FEISHU_APP_TOKEN`、`FEISHU_USER_TABLE`、`FEISHU_USER_VIEW`、`FEISHU_USERNAME_FIELD`、`FEISHU_PASSWORD_FIELD`、`FEISHU_DISPLAY_FIELD`。
+- 默认列名尝试顺序：账号 → 用户名 → 登录账号；密码 → 口令 → password（可继续用环境变量覆盖）。
 - 附带：`GET ?ping=1` 快速自测；需启用 PHP cURL 扩展。
 
 ### 4.2 事件上报 `POST /api/log.php`
@@ -145,6 +147,7 @@
 ---
 
 ## 8) 变更记录 / 进度
+- **v0.3（2025-10-26）** 调整 16:9 外壳层级并恢复全局背景；登录页布局放大防遮挡；默认优先读取“账号/密码”列。
 - **v0.2（2025-10-25）** 登录改接飞书多维表格；首页/登录页 16:9 视觉重构与交互优化。
 - **v0.1（2025-10-24）** 建立 Codex 协作基线文档：项目结构梳理、接口契约、固定提示词模板。
 
