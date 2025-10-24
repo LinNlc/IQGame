@@ -111,65 +111,404 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 /* 若出现回退元素，屏蔽 */
 .passage .link-back, #back { display: none !important; }
 
-/* 自定义按钮（可改） */
-.custombutton {
-  background-color: #7AC45C;
-  border: none; color: white; width: 200px; height: 60px;
-  padding: 15px 32px; text-align: center; text-decoration: none;
-  display: inline-block; font-size: 26px; margin: 4px 2px;
-  cursor: pointer; border-radius: 8px; transition: background-color .3s ease;
+html, body, #story { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Source Han Sans', 'Microsoft YaHei', sans-serif;
+  background-color: #020617;
+  color: #e9ecff;
+  overflow: hidden;
+  position: relative;
+  min-height: 100%;
+  --app-bg-image: none;
 }
 
-/* 登录页全屏背景容器（只在 Login 页面挂载） */
-#login-bg{
-  position: fixed; inset: 0;
-  background-color: #000;                 /* 无图时的底色 */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, filter 0.35s ease;
+  z-index: -2;
+}
+
+body::before {
+  background-image: var(--app-bg-image);
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  filter: brightness(0.92) saturate(1.02);/* 轻微压暗+提饱和，提升对比 */
+  filter: brightness(0.58);
+}
+
+body::after {
+  z-index: -1;
+  background: radial-gradient(circle at 18% 22%, rgba(82, 119, 255, 0.32), transparent 60%),
+              radial-gradient(circle at 82% 78%, rgba(250, 116, 198, 0.26), transparent 62%),
+              linear-gradient(135deg, rgba(6, 12, 28, 0.82), rgba(8, 16, 40, 0.78));
+}
+
+body.is-login::before {
+  filter: brightness(0.72) saturate(1.05);
+}
+
+body.is-login::after {
+  background: radial-gradient(circle at 28% 28%, rgba(94, 142, 255, 0.35), transparent 62%),
+              radial-gradient(circle at 74% 70%, rgba(255, 132, 182, 0.26), transparent 60%),
+              linear-gradient(120deg, rgba(10, 16, 36, 0.82), rgba(7, 18, 44, 0.88));
+}
+
+#story {
+  position: relative;
+  z-index: 1;
+}
+
+.passage {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.app-viewport {
+  position: relative;
+  width: min(92vw, 1680px);
+  max-height: min(100vh, calc(100vw / 1.7778));
+  aspect-ratio: 16 / 9;
+  border-radius: clamp(28px, 3.2vw, 44px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgba(135, 162, 255, 0.18);
+  box-shadow: 0 48px 140px rgba(4, 9, 20, 0.72);
+  background: linear-gradient(135deg, rgba(12, 18, 40, 0.86), rgba(8, 14, 36, 0.9));
+  backdrop-filter: blur(12px);
+}
+
+.app-viewport::before {
+  content: '';
+  position: absolute;
+  inset: -18% -32% 26% 32%;
+  background: radial-gradient(circle at 22% 32%, rgba(120, 162, 255, 0.42), transparent 62%),
+              radial-gradient(circle at 78% 68%, rgba(255, 120, 198, 0.32), transparent 62%);
+  filter: blur(2px);
   z-index: 0;
 }
-/* 确保登录面板在背景之上 */
-.login-panel{ position: relative; z-index: 1; }
 
-/* 登录面板 */
-.login-panel{
-  max-width: 320px; margin: 12vh auto 0; padding: 18px 20px; border-radius: 12px;
-  background: rgba(0,0,0,.6); color: #fff; backdrop-filter: blur(6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-}
-.login-panel h2{ margin: 0 0 12px; font-weight: 700 }
-
-/* 输入框可读性强化：用户名清晰可见（只隐藏密码内容） */
-.login-panel input{
-  width:100%; box-sizing: border-box; padding:10px 12px; margin:8px 0;
-  border-radius:8px; border:none; outline:none;
-  background:#ffffff !important;
-  color:#111111 !important;
-  -webkit-text-fill-color:#111111 !important; /* 修复某些浏览器“变灰” */
-  caret-color:#111111;
-}
-.login-panel input:focus{
-  background:#ffffff !important;
-  color:#111111 !important;
-  outline:2px solid rgba(96,165,250,.6);       /* 聚焦描边，可调整颜色 */
-}
-.login-panel input::placeholder{ color:#999999; }
-
-/* 覆盖浏览器自动填充的灰/黄背景 */
-.login-panel input:-webkit-autofill{
-  -webkit-text-fill-color:#111111 !important;
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+.app-viewport__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  padding: clamp(36px, 4vw, 72px);
+  gap: clamp(36px, 5vw, 88px);
+  align-items: stretch;
 }
 
-/* 只隐藏密码：用户名照常显示 */
-#lg-pass { -webkit-text-security: disc; }  /* 多数浏览器已有 type=password，此为兜底 */
+.login-layout {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  background: linear-gradient(145deg, rgba(9, 16, 38, 0.92), rgba(11, 20, 48, 0.9));
+  border-radius: clamp(24px, 3vw, 40px);
+  border: 1px solid rgba(118, 148, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.login-hero {
+  flex: 1.05;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(18px, 2.6vw, 32px);
+  padding: clamp(40px, 5vw, 82px);
+  color: #f3f6ff;
+}
+
+.login-hero__eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin: 0;
+}
+
+.login-hero h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 3.2vw, 3.6rem);
+  font-weight: 600;
+}
+
+.login-hero__copy {
+  margin: 0;
+  max-width: 32ch;
+  line-height: 1.75;
+  color: rgba(235, 239, 255, 0.82);
+}
+
+.login-panel {
+  flex: 0 0 clamp(360px, 28vw, 520px);
+  align-self: center;
+  background: linear-gradient(180deg, rgba(12, 18, 42, 0.94), rgba(14, 22, 48, 0.9));
+  border-radius: 30px;
+  padding: clamp(32px, 3.2vw, 44px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #f4f6ff;
+  box-shadow: 0 28px 72px rgba(5, 12, 30, 0.65);
+}
+
+.login-panel h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  font-weight: 600;
+}
+
+.login-panel p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(230, 234, 255, 0.7);
+}
+
+.login-panel input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(116, 150, 255, 0.32);
+  background: rgba(255, 255, 255, 0.96);
+  color: #0e152f;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login-panel input:focus {
+  border-color: rgba(130, 170, 255, 0.85);
+  box-shadow: 0 0 0 3px rgba(130, 170, 255, 0.32);
+}
+
+.login-panel input::placeholder {
+  color: rgba(30, 40, 80, 0.45);
+}
+
+.login-panel input:-webkit-autofill {
+  -webkit-text-fill-color: #0e152f !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.98) inset !important;
+  border-radius: 14px;
+}
+
+#lg-pass { -webkit-text-security: disc; }
+
+.login-panel button {
+  margin-top: 4px;
+  padding: 15px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #7ea7ff, #5175ff);
+  color: #0c1331;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login-panel button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(80, 126, 255, 0.5);
+}
+
+.login-panel button[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+  box-shadow: none;
+  transform: none;
+}
+
+#lg-tip {
+  min-height: 20px;
+  font-size: 0.9rem;
+  color: #ffb4c1;
+}
 
 /* 全屏用户名水印（基础样式，具体密度/颜色由 JS 控制） */
 #wm { position: fixed; inset: 0; pointer-events: none; z-index: 9999; transform: rotate(-20deg); }
 #wm .cell { text-align: center; white-space: nowrap; user-select: none; }
+
+/* 主模式选择界面 */
+.mode-shell {
+  display: grid;
+  grid-template-columns: 1.02fr 1fr;
+  gap: clamp(32px, 4vw, 70px);
+  align-items: stretch;
+  width: 100%;
+  position: relative;
+}
+
+.mode-shell::after {
+  content: '';
+  position: absolute;
+  inset: -22% -24% 42% 56%;
+  background: radial-gradient(circle at 38% 58%, rgba(101, 151, 255, 0.24), transparent 60%);
+  filter: blur(12px);
+  opacity: 0.85;
+  z-index: -1;
+}
+
+.mode-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+.mode-meta__eyebrow {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.48em;
+  color: rgba(208, 220, 255, 0.7);
+}
+
+.mode-meta h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 3.4vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mode-meta__copy {
+  margin: 0;
+  max-width: 48ch;
+  line-height: 1.7;
+  color: rgba(227, 234, 255, 0.78);
+  font-size: 1rem;
+}
+
+.mode-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(26px, 3.4vw, 40px);
+  align-items: stretch;
+}
+
+.mode-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(26px, 3.2vw, 36px);
+  border-radius: 28px;
+  background: linear-gradient(150deg, rgba(16, 26, 58, 0.92), rgba(11, 20, 46, 0.88));
+  border: 1px solid rgba(120, 150, 255, 0.26);
+  box-shadow: 0 30px 82px rgba(7, 14, 34, 0.55);
+  min-height: clamp(270px, 30vh, 360px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.mode-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 22%, rgba(120, 200, 255, 0.2), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mode-tile__head {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1;
+}
+
+.mode-tile h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.2vw, 2rem);
+  font-weight: 600;
+}
+
+.mode-tile p {
+  margin: 0;
+  color: rgba(219, 228, 255, 0.78);
+  line-height: 1.65;
+}
+
+.mode-tile__footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+.mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1.6rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(230, 236, 255, 0.9);
+}
+
+.mode-chip--cta {
+  border: none;
+  background: linear-gradient(135deg, rgba(126, 206, 255, 0.95), rgba(86, 152, 255, 0.95));
+  color: #061029;
+  box-shadow: 0 18px 40px rgba(99, 168, 255, 0.45);
+}
+
+.mode-tile.is-active {
+  cursor: pointer;
+}
+
+.mode-tile.is-active:hover {
+  transform: translateY(-10px);
+  border-color: rgba(149, 187, 255, 0.75);
+  box-shadow: 0 35px 90px rgba(9, 20, 52, 0.65);
+}
+
+.mode-tile.is-active:hover::before {
+  opacity: 1;
+}
+
+.mode-tile.is-disabled {
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(145deg, rgba(17, 20, 40, 0.85), rgba(11, 16, 34, 0.85));
+}
+
+.mode-tile.is-disabled p,
+.mode-tile.is-disabled h2,
+.mode-tile.is-disabled .mode-chip {
+  color: rgba(195, 202, 230, 0.55);
+}
+
+@media (max-width: 1366px) {
+  body { font-size: 15px; }
+  .app-viewport { border-radius: 24px; }
+}
+
+@media (max-width: 1100px) {
+  .mode-shell { grid-template-columns: 1fr; }
+  .mode-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .login-layout { flex-direction: column; }
+  .login-hero { display: none; }
+  body { overflow: auto; }
+}
+
+@media (max-width: 920px) {
+  .mode-tiles { grid-template-columns: 1fr; }
+  body { overflow: auto; }
+}
 </style><script role="script" id="twine-user-script" type="text/twine-javascript">/* ========= 起点与存档/回退配置 ========= */
 Config.passages.start = 'Login';
 Config.history.controls = false;
@@ -178,8 +517,9 @@ Config.saves.maxAutoSaves = 1;
 Config.saves.maxSlotSaves = 0;
 
 /* ========= 登录页背景 & 水印：集中可调参数（改这里就行） ========= */
-// 登录页背景图（相对/绝对路径都可）
+// 登录/全局背景图（相对/绝对路径皆可）
 setup.LoginBG_URL = 'assets/img/封面.jpg';
+setup.AppBG_URL = 'assets/img/封面.jpg';
 
 // 水印参数：按需调整（透明度/密度/字号/颜色）
 setup.WM = {
@@ -249,7 +589,22 @@ setup.gotoHome = function () {
 
 setup.tryLogin = function (u, p, tipEl) {
   const tip = (msg) => { if (tipEl) tipEl.textContent = msg; };
-  if (!u || !p) { tip('请输入用户名和密码'); return Promise.resolve(false); }
+  const toFriendly = (code) => {
+    const map = {
+      invalid_credentials: '账号或密码错误',
+      missing_params: '请输入完整的账号与密码',
+      bad_json: '请求格式错误',
+      method_not_allowed: '请求方式不被允许',
+      server_error: '服务暂时不可用，请稍后重试',
+      fetch_failed: '网络连接异常，请检查后重试',
+      bad_response: '服务响应异常，请联系管理员'
+    };
+    return map[code] || code;
+  };
+
+  if (!u || !p) { tip('请输入账号和密码'); return Promise.resolve(false); }
+
+  tip('正在验证...');
 
   return fetch(setup.API_BASE + 'auth.php', {
     method: 'POST',
@@ -260,33 +615,53 @@ setup.tryLogin = function (u, p, tipEl) {
     const text = await r.text();
     let data;
     try { data = JSON.parse(text); }
-    catch { throw new Error('非 JSON 响应：' + text.slice(0,120)); }
+    catch {
+      const err = new Error('bad_response');
+      err.code = 'bad_response';
+      err.detail = text.slice(0, 120);
+      throw err;
+    }
 
     if (!r.ok) {
-      const err = (data && data.error) ? data.error : ('HTTP ' + r.status);
-      throw new Error(err);
+      const code = (data && data.error) ? data.error : ('HTTP_' + r.status);
+      const err = new Error(code);
+      err.code = code;
+      throw err;
     }
     return data;
   })
   .then((res) => {
     if (res && res.ok) {
-      State.variables.user = res.user.username;
+      const returnedUser = res.user || {};
+      const canonicalName = returnedUser.username || u;
+      const displayName = returnedUser.displayName || canonicalName;
+      State.variables.user = canonicalName;
+      State.variables.userDisplay = displayName;
       localStorage.setItem('tw_user', State.variables.user);
-      setup.renderWatermark();
+      setup.renderWatermark(displayName);
 
       // ✅ 登录成功立刻以“登录账号”为姓名打一条 start
       if (typeof setup.logEvent === 'function') {
         setup.logEvent('start', 'enter', 'StoryStart');
       }
 
+      tip('登录成功，正在跳转...');
       setup.gotoHome();
       return true;
     }
-    tip('登录失败');
+    const code = res && (res.error || res.message || 'login_failed');
+    tip('登录失败：' + toFriendly(code));
     return false;
   })
   .catch((e) => {
-    tip('服务器错误：' + (e && e.message ? e.message : 'unknown'));
+    const raw = (e && (e.code || e.message)) || 'server_error';
+    const code = raw === 'Failed to fetch' ? 'fetch_failed' : raw;
+    const friendly = toFriendly(code);
+    if (code === 'invalid_credentials') {
+      tip(friendly);
+    } else {
+      tip('服务器错误：' + friendly);
+    }
     return false;
   });
 };
@@ -295,6 +670,7 @@ Macro.add('logout', {
   handler() {
     localStorage.removeItem('tw_user');
     State.variables.user = null;
+    State.variables.userDisplay = null;
     var wm = document.getElementById('wm'); if (wm) wm.remove();
     Engine.play('Login');
   }
@@ -338,21 +714,21 @@ setup.renderWatermark = function (name) {
   document.body.appendChild(w);
 };
 
-/* ===== Login UI：渲染完成后再绑定事件 + 背景挂载 ===== */
+/* ===== Login UI：渲染完成后再绑定事件 + 背景切换 ===== */
 $(document).on(':passagedisplay', function (ev) {
   const isLogin = ev.passage && ev.passage.title === 'Login';
+  const body = document.body;
 
-  // 登录页背景（进入 Login 时挂载，离开时移除）
-  var bg = document.getElementById('login-bg');
-  if (isLogin) {
-    if (!bg) {
-      bg = document.createElement('div'); bg.id = 'login-bg';
-      document.body.appendChild(bg);
+  if (body) {
+    var fallback = (typeof setup.AppBG_URL === 'string' && setup.AppBG_URL) || '';
+    if (!fallback) { fallback = (typeof setup.LoginBG_URL === 'string' && setup.LoginBG_URL) || ''; }
+    var chosen = isLogin ? ((typeof setup.LoginBG_URL === 'string' && setup.LoginBG_URL) || fallback) : fallback;
+    var cssValue = 'none';
+    if (chosen) {
+      cssValue = 'url("' + String(chosen).replace(/"/g, '\"') + '")';
     }
-    var url = setup.LoginBG_URL || '';
-    bg.style.backgroundImage = url ? ("url('" + url + "')") : 'none';
-  } else if (bg) {
-    bg.remove();
+    body.style.setProperty('--app-bg-image', cssValue);
+    body.classList.toggle('is-login', !!isLogin);
   }
 
   if (!isLogin) return;
@@ -364,11 +740,42 @@ $(document).on(':passagedisplay', function (ev) {
   var t = document.getElementById('lg-tip');
   if (!u || !p || !b) return;
 
-  function doLogin () {
-    setup.tryLogin((u.value || '').trim(), (p.value || '').trim(), t);
+  var defaultBtnText = b.textContent;
+  function setLoading(flag) {
+    if (!b) return;
+    if (flag) {
+      b.disabled = true;
+      b.textContent = '验证中…';
+    } else {
+      b.disabled = false;
+      b.textContent = defaultBtnText;
+    }
   }
-  b.addEventListener('click', doLogin);
-  p.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+
+  function doLogin () {
+    var username = (u.value || '').trim();
+    var password = (p.value || '').trim();
+    var shouldLock = !!(username && password);
+    if (shouldLock) { setLoading(true); }
+    var result = setup.tryLogin(username, password, t);
+    if (result && typeof result.finally === 'function') {
+      result.finally(function () { if (shouldLock) { setLoading(false); } });
+    } else if (shouldLock) {
+      setLoading(false);
+    }
+  }
+
+  b.addEventListener('click', function () {
+    if (!b.disabled) { doLogin(); }
+  });
+  [u, p].forEach(function (input) {
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!b.disabled) { doLogin(); }
+      }
+    });
+  });
   setTimeout(function(){ try { u.focus(); } catch (e) {} }, 0);
 });
 
@@ -388,253 +795,40 @@ $(document).on(':passagedisplay', function () {
 &lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
 
 &lt;!-- 模式选择主界面 --&gt;
-&lt;style&gt;
-  :root {
-    --mode-card-border: rgba(88, 150, 255, 0.35);
-    --mode-card-bg: rgba(12, 17, 34, 0.72);
-    --mode-card-bg-disabled: rgba(40, 45, 58, 0.6);
-    --mode-highlight: rgba(102, 178, 255, 0.55);
-  }
-
-  .main-mode-screen {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6vh 5vw;
-    box-sizing: border-box;
-    color: #e9ecf5;
-    font-family: &#x27;Source Han Sans&#x27;, &#x27;Microsoft YaHei&#x27;, sans-serif;
-    overflow: hidden;
-  }
-
-  .mode-backdrop {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 20% 20%, rgba(80, 120, 255, 0.25), transparent 55%),
-                radial-gradient(circle at 80% 0%, rgba(255, 120, 180, 0.2), transparent 60%),
-                linear-gradient(130deg, #040710 0%, #0a1630 55%, #03050d 100%);
-    z-index: 0;
-  }
-
-  .mode-backdrop::after {
-    content: &#x27;&#x27;;
-    position: absolute;
-    inset: 0;
-    background: url(&#x27;assets/img/1&#x27;) center/cover no-repeat fixed;
-    opacity: 0.45;
-    filter: saturate(120%) contrast(110%);
-    mix-blend-mode: screen;
-  }
-
-  .mode-content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    flex-direction: column;
-    gap: 3vh;
-  }
-
-  .mode-header {
-    max-width: 720px;
-  }
-
-  .mode-eyebrow {
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin: 0 0 0.75rem;
-  }
-
-  .mode-header h1 {
-    font-size: clamp(2.4rem, 4vw, 3.5rem);
-    margin: 0 0 0.6rem;
-    font-weight: 600;
-  }
-
-  .mode-subtitle {
-    font-size: 1rem;
-    line-height: 1.7;
-    max-width: 60ch;
-    opacity: 0.8;
-    margin: 0;
-  }
-
-  .mode-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2.4rem;
-  }
-
-  .mode-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 320px;
-    border-radius: 24px;
-    border: 1px solid var(--mode-card-border);
-    background: var(--mode-card-bg);
-    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
-    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
-    cursor: pointer;
-  }
-
-  .mode-card::before {
-    content: &#x27;&#x27;;
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(120, 200, 255, 0.15), rgba(120, 200, 255, 0));
-    opacity: 0;
-    transition: opacity 0.35s ease;
-  }
-
-  .mode-card__art {
-    height: 160px;
-    background-size: cover;
-    background-position: center;
-    filter: saturate(120%) brightness(0.9);
-  }
-
-  .mode-card__art--script {
-    background-image: linear-gradient(160deg, rgba(180, 180, 180, 0.25), rgba(80, 80, 80, 0.4)),
-                      url(&#x27;assets/img/1&#x27;);
-    mix-blend-mode: lighten;
-  }
-
-  .mode-card__art--yuqing {
-    background-image: linear-gradient(160deg, rgba(90, 150, 255, 0.45), rgba(40, 90, 255, 0.15)),
-                      url(&#x27;assets/img/1&#x27;);
-  }
-
-  .mode-card__body {
-    padding: 1.8rem 2rem 1.2rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .mode-card__body h2 {
-    font-size: 1.6rem;
-    margin: 0;
-  }
-
-  .mode-card__body p {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.95rem;
-    opacity: 0.85;
-  }
-
-  .mode-card__footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 2rem 1.8rem;
-  }
-
-  .mode-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.4rem 1.4rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
-
-  .mode-tag--primary {
-    background: linear-gradient(135deg, rgba(102, 178, 255, 0.8), rgba(51, 109, 255, 0.8));
-    color: #0b1224;
-    border: none;
-    opacity: 1;
-    box-shadow: 0 8px 18px rgba(102, 178, 255, 0.45);
-  }
-
-  .mode-card--active:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 30px 65px rgba(18, 29, 60, 0.55);
-    border-color: rgba(120, 190, 255, 0.6);
-  }
-
-  .mode-card--active:hover::before {
-    opacity: 1;
-  }
-
-  .mode-card--disabled {
-    background: var(--mode-card-bg-disabled);
-    cursor: not-allowed;
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .mode-card--disabled .mode-card__body,
-  .mode-card--disabled .mode-card__body p,
-  .mode-card--disabled .mode-tag {
-    opacity: 0.55;
-  }
-
-  @media (max-width: 720px) {
-    .mode-content {
-      padding: 2rem 1rem;
-    }
-
-    .mode-grid {
-      gap: 1.6rem;
-    }
-
-    .mode-card {
-      min-height: 280px;
-    }
-  }
-&lt;/style&gt;
-
-&lt;div class=&quot;main-mode-screen&quot;&gt;
-  &lt;div class=&quot;mode-backdrop&quot;&gt;&lt;/div&gt;
-  &lt;div class=&quot;mode-content&quot;&gt;
-    &lt;header class=&quot;mode-header&quot;&gt;
-      &lt;p class=&quot;mode-eyebrow&quot;&gt;MODE SELECT&lt;/p&gt;
-      &lt;h1&gt;选择你的游戏模式&lt;/h1&gt;
-      &lt;p class=&quot;mode-subtitle&quot;&gt;挑选最新的体验或回顾往期经典内容，开始一场沉浸式的危机推演之旅。&lt;/p&gt;
-    &lt;/header&gt;
-    &lt;section class=&quot;mode-grid&quot;&gt;
-      &lt;article class=&quot;mode-card mode-card--disabled&quot; aria-disabled=&quot;true&quot;&gt;
-        &lt;div class=&quot;mode-card__art mode-card__art--script&quot;&gt;&lt;/div&gt;
-        &lt;div class=&quot;mode-card__body&quot;&gt;
+&lt;div class=&quot;app-viewport app-viewport--main&quot;&gt;
+  &lt;div class=&quot;app-viewport__inner mode-shell&quot;&gt;
+    &lt;section class=&quot;mode-meta&quot;&gt;
+      &lt;p class=&quot;mode-meta__eyebrow&quot;&gt;MODE SELECT&lt;/p&gt;
+      &lt;h1&gt;危机演练中心&lt;/h1&gt;
+      &lt;p class=&quot;mode-meta__copy&quot;&gt;整合剧本训练与舆情推演，一站式管理最新演练内容。&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section class=&quot;mode-tiles&quot;&gt;
+      &lt;article class=&quot;mode-tile is-disabled&quot; aria-disabled=&quot;true&quot;&gt;
+        &lt;div class=&quot;mode-tile__head&quot;&gt;
           &lt;h2&gt;剧本模式&lt;/h2&gt;
-          &lt;p&gt;长篇叙事体验正在打磨中，敬请期待更宏大的沉浸式故事线。&lt;/p&gt;
+          &lt;p&gt;长篇沉浸式剧本正在制作中，上线后可体验完整危机叙事链路。&lt;/p&gt;
         &lt;/div&gt;
-        &lt;footer class=&quot;mode-card__footer&quot;&gt;
-          &lt;span class=&quot;mode-tag&quot;&gt;未开放&lt;/span&gt;
-        &lt;/footer&gt;
+        &lt;div class=&quot;mode-tile__footer&quot;&gt;
+          &lt;span class=&quot;mode-chip&quot;&gt;未开放&lt;/span&gt;
+        &lt;/div&gt;
       &lt;/article&gt;
-      &lt;article class=&quot;mode-card mode-card--active&quot; data-target=&quot;舆情游戏菜单&quot;&gt;
-        &lt;div class=&quot;mode-card__art mode-card__art--yuqing&quot;&gt;&lt;/div&gt;
-        &lt;div class=&quot;mode-card__body&quot;&gt;
-          &lt;h2&gt;舆情游戏&lt;/h2&gt;
-          &lt;p&gt;进入每周更新的舆情推演剧本，练习情境判断与危机处理决策。&lt;/p&gt;
+      &lt;article class=&quot;mode-tile is-active&quot; data-target=&quot;舆情游戏菜单&quot;&gt;
+        &lt;div class=&quot;mode-tile__head&quot;&gt;
+          &lt;h2&gt;舆情推演&lt;/h2&gt;
+          &lt;p&gt;进入每周更新的情境演练，检验舆情识别、应对与复盘能力。&lt;/p&gt;
         &lt;/div&gt;
-        &lt;footer class=&quot;mode-card__footer&quot;&gt;
-          &lt;span class=&quot;mode-tag mode-tag--primary&quot;&gt;立即进入&lt;/span&gt;
-        &lt;/footer&gt;
+        &lt;div class=&quot;mode-tile__footer&quot;&gt;
+          &lt;span class=&quot;mode-chip mode-chip--cta&quot;&gt;进入体验&lt;/span&gt;
+        &lt;/div&gt;
       &lt;/article&gt;
     &lt;/section&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 
-&lt;!-- 交互脚本：将可点击卡片跳转到对应模式主菜单 --&gt;
 &lt;&lt;script&gt;&gt;
 (function () {
-  /* 监听模式卡片的点击事件，将 data-target 指向的 passage 作为模式入口。
-   * 若后续新增模式，请为卡片补充 data-target 并在这里复用逻辑即可。 */
   $(document).one(&#x27;:passagedisplay&#x27;, function () {
-    $(&#x27;.mode-card--active[data-target]&#x27;).on(&#x27;click&#x27;, function () {
+    $(&#x27;.mode-tile.is-active[data-target]&#x27;).on(&#x27;click&#x27;, function () {
       var target = $(this).data(&#x27;target&#x27;);
       if (target) {
         Engine.play(target);
@@ -2823,12 +3017,22 @@ Text Interaction Box</tw-passagedata><tw-passagedata pid="7" name="widget" tags=
 &#x27;);
   }
 })();
-&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="19" name="Login" tags="" position="700,100" size="100,100">&lt;div class=&quot;login-panel&quot;&gt;
-  &lt;h2&gt;登录&lt;/h2&gt;
-  &lt;input id=&quot;lg-user&quot; placeholder=&quot;用户名&quot;&gt;
-  &lt;input id=&quot;lg-pass&quot; type=&quot;password&quot; placeholder=&quot;密码&quot;&gt;
-  &lt;button id=&quot;lg-btn&quot;&gt;登录&lt;/button&gt;
-  &lt;div id=&quot;lg-tip&quot;&gt;&lt;/div&gt;
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="19" name="Login" tags="" position="700,100" size="100,100">&lt;div class=&quot;app-viewport app-viewport--login&quot;&gt;
+  &lt;div class=&quot;app-viewport__inner login-layout&quot;&gt;
+    &lt;section class=&quot;login-hero&quot;&gt;
+      &lt;p class=&quot;login-hero__eyebrow&quot;&gt;CRISIS SIM&lt;/p&gt;
+      &lt;h1&gt;智策危机演练平台&lt;/h1&gt;
+      &lt;p class=&quot;login-hero__copy&quot;&gt;通过一体化仪表盘快速进入本周舆情推演，保持团队响应力。&lt;/p&gt;
+    &lt;/section&gt;
+    &lt;section class=&quot;login-panel&quot;&gt;
+      &lt;h2&gt;欢迎登录&lt;/h2&gt;
+      &lt;p&gt;请输入分配给您的飞书多维表格账号与密码，以继续演练。&lt;/p&gt;
+      &lt;input id=&quot;lg-user&quot; placeholder=&quot;用户名&quot; autocomplete=&quot;username&quot;&gt;
+      &lt;input id=&quot;lg-pass&quot; type=&quot;password&quot; placeholder=&quot;密码&quot; autocomplete=&quot;current-password&quot;&gt;
+      &lt;button id=&quot;lg-btn&quot;&gt;进入系统&lt;/button&gt;
+      &lt;div id=&quot;lg-tip&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
 &lt;/div&gt;</tw-passagedata></tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
 	/*! SugarCube JS */
