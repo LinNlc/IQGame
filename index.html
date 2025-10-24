@@ -383,106 +383,307 @@ $(document).on(':passagedisplay', function () {
   if (State.variables.user) { setup.renderWatermark(State.variables.user); }
 });
 </script><tw-tag name="body" color="red"></tw-tag><tw-tag name="body&#39;" color="red"></tw-tag><tw-tag name="body1" color="red"></tw-tag><tw-tag name="body2" color="red"></tw-tag><tw-tag name="全身而退" color="green"></tw-tag><tw-tag name="铁饭碗" color="orange"></tw-tag><tw-tag name="燃起来了" color="red"></tw-tag><tw-tag name="信徒" color="purple"></tw-tag><tw-passagedata pid="1" name="Main" tags="" position="700,200" size="100,100">&lt;&lt;if Save.browser.size &gt; 0&gt;&gt;
-	&lt;&lt;run Save.browser.continue().catch(()=&gt;null)&gt;&gt;
-&lt;&lt;/if&gt;&gt;
+    &lt;&lt;run Save.browser.continue().catch(()=&gt;null)&gt;&gt;
+&lt;&lt;endif&gt;&gt;
 &lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
-&lt;html lang=&quot;zh-CN&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;style&gt;
-        /* 页面背景 */
-        body {
-            background-color: #f0f0f0; /* 背景颜色 */
-            background-image: url(&#39;assets/img/封面.jpg&#39;); /* 替换为您的背景图片URL */
-            background-size: contain; /* 让背景图片覆盖整个页面 */
-            background-repeat: no-repeat; /* 不重复背景图像 */
-            background-position: center; /* 背景居中 */
-            margin: 0; /* 去掉默认边距 */
-            height: 100vh; /* 使 body 高度为视口高度 */
-        }
 
-        p {
-            font-size: 18px; /* 段落字体大小 */
-            margin: 10px 0; /* 上下边距 */
-        }
+&lt;!-- 模式选择主界面 --&gt;
+&lt;style&gt;
+  :root {
+    --mode-card-border: rgba(88, 150, 255, 0.35);
+    --mode-card-bg: rgba(12, 17, 34, 0.72);
+    --mode-card-bg-disabled: rgba(40, 45, 58, 0.6);
+    --mode-highlight: rgba(102, 178, 255, 0.55);
+  }
 
-        #custom-button-container{
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* ← 原来是 center，改成从上开始 */
-            padding-top: 300px;          /* ← 往下挪多少自己改 */
-            box-sizing: border-box;
-          }
+  .main-mode-screen {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 5vw;
+    box-sizing: border-box;
+    color: #e9ecf5;
+    font-family: &#x27;Source Han Sans&#x27;, &#x27;Microsoft YaHei&#x27;, sans-serif;
+    overflow: hidden;
+  }
 
+  .mode-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(80, 120, 255, 0.25), transparent 55%),
+                radial-gradient(circle at 80% 0%, rgba(255, 120, 180, 0.2), transparent 60%),
+                linear-gradient(130deg, #040710 0%, #0a1630 55%, #03050d 100%);
+    z-index: 0;
+  }
 
-        #custom-button-container button {
-            /* 按钮的基本样式 */
-            background-color: #7AC45C; /* 背景颜色 */
-            border: none; /* 去掉边框 */
-            color: white; /* 文字颜色 */
-            width: 300px; /* 按钮宽度 */
-            height: 60px; /* 按钮高度 */
-            padding: 15px 32px; /* 内边距 */
-            text-align: center; /* 文字对齐 */
-            text-decoration: none; /* 去掉下划线 */
-            display: inline-block; /* 显示为内联块 */
-            font-size: 26px; /* 字体大小 */
-            margin: 4px 2px; /* 外边距 */
-            cursor: pointer; /* 鼠标指针样式 */
-            border-radius: 8px; /* 圆角 */
-            transition: background-color 0.3s ease; /* 背景颜色过渡效果 */
-        }
+  .mode-backdrop::after {
+    content: &#x27;&#x27;;
+    position: absolute;
+    inset: 0;
+    background: url(&#x27;assets/img/1&#x27;) center/cover no-repeat fixed;
+    opacity: 0.45;
+    filter: saturate(120%) contrast(110%);
+    mix-blend-mode: screen;
+  }
 
-        #custom-button-container button:hover {
-            /* 鼠标悬停时的样式 */
-            background-color: #45a049; /* 悬停时的背景颜色 */
-        }
+  .mode-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
+  }
 
-        #custom-button-container .custom-button-2 {
-            background-color: #7AC45C; /* 另一个按钮的背景颜色 */
-            top: 500px; /* 设置另一个按钮的纵坐标位置 */
-            transform: translateX(-50%); /* 水平居中对齐 */
-        }
+  .mode-header {
+    max-width: 720px;
+  }
 
-        #custom-button-container .custom-button-2:hover {
-            background-color: #d32f2f; /* 悬停时的背景颜色 */
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
+  .mode-eyebrow {
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin: 0 0 0.75rem;
+  }
 
-    &lt;div id=&quot;custom-button-container&quot;&gt;
-    
-    
-    
-    
-    
-        &lt;&lt;button &quot;开始游戏&quot;&gt;&gt;
-            &lt;&lt;audio &quot;bgm1&quot; loop play&gt;&gt;
-            &lt;&lt;goto &quot;剧情1&quot;&gt;&gt;
-        &lt;&lt;/button&gt;&gt;
-    &lt;/div&gt;
+  .mode-header h1 {
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+  }
 
-    &lt;!-- SugarCube 变量设置 --&gt;
-    &lt;&lt;set $key to 0&gt;&gt;
+  .mode-subtitle {
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 60ch;
+    opacity: 0.8;
+    margin: 0;
+  }
 
-&lt;/body&gt;
-&lt;/html&gt;</tw-passagedata><tw-passagedata pid="2" name="StoryCaption" tags="" position="1400,100" size="100,100"></tw-passagedata><tw-passagedata pid="3" name="StoryInit" tags="" position="1200,100" size="100,100">&lt;&lt;set $MENU_PASSAGE = &quot;Main&quot;&gt;&gt;
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2.4rem;
+  }
+
+  .mode-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 320px;
+    border-radius: 24px;
+    border: 1px solid var(--mode-card-border);
+    background: var(--mode-card-bg);
+    box-shadow: 0 25px 55px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    cursor: pointer;
+  }
+
+  .mode-card::before {
+    content: &#x27;&#x27;;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(120, 200, 255, 0.15), rgba(120, 200, 255, 0));
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .mode-card__art {
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    filter: saturate(120%) brightness(0.9);
+  }
+
+  .mode-card__art--script {
+    background-image: linear-gradient(160deg, rgba(180, 180, 180, 0.25), rgba(80, 80, 80, 0.4)),
+                      url(&#x27;assets/img/1&#x27;);
+    mix-blend-mode: lighten;
+  }
+
+  .mode-card__art--yuqing {
+    background-image: linear-gradient(160deg, rgba(90, 150, 255, 0.45), rgba(40, 90, 255, 0.15)),
+                      url(&#x27;assets/img/1&#x27;);
+  }
+
+  .mode-card__body {
+    padding: 1.8rem 2rem 1.2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .mode-card__body h2 {
+    font-size: 1.6rem;
+    margin: 0;
+  }
+
+  .mode-card__body p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    opacity: 0.85;
+  }
+
+  .mode-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 2rem 1.8rem;
+  }
+
+  .mode-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 1.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .mode-tag--primary {
+    background: linear-gradient(135deg, rgba(102, 178, 255, 0.8), rgba(51, 109, 255, 0.8));
+    color: #0b1224;
+    border: none;
+    opacity: 1;
+    box-shadow: 0 8px 18px rgba(102, 178, 255, 0.45);
+  }
+
+  .mode-card--active:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 65px rgba(18, 29, 60, 0.55);
+    border-color: rgba(120, 190, 255, 0.6);
+  }
+
+  .mode-card--active:hover::before {
+    opacity: 1;
+  }
+
+  .mode-card--disabled {
+    background: var(--mode-card-bg-disabled);
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .mode-card--disabled .mode-card__body,
+  .mode-card--disabled .mode-card__body p,
+  .mode-card--disabled .mode-tag {
+    opacity: 0.55;
+  }
+
+  @media (max-width: 720px) {
+    .mode-content {
+      padding: 2rem 1rem;
+    }
+
+    .mode-grid {
+      gap: 1.6rem;
+    }
+
+    .mode-card {
+      min-height: 280px;
+    }
+  }
+&lt;/style&gt;
+
+&lt;div class=&quot;main-mode-screen&quot;&gt;
+  &lt;div class=&quot;mode-backdrop&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;mode-content&quot;&gt;
+    &lt;header class=&quot;mode-header&quot;&gt;
+      &lt;p class=&quot;mode-eyebrow&quot;&gt;MODE SELECT&lt;/p&gt;
+      &lt;h1&gt;选择你的游戏模式&lt;/h1&gt;
+      &lt;p class=&quot;mode-subtitle&quot;&gt;挑选最新的体验或回顾往期经典内容，开始一场沉浸式的危机推演之旅。&lt;/p&gt;
+    &lt;/header&gt;
+    &lt;section class=&quot;mode-grid&quot;&gt;
+      &lt;article class=&quot;mode-card mode-card--disabled&quot; aria-disabled=&quot;true&quot;&gt;
+        &lt;div class=&quot;mode-card__art mode-card__art--script&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;mode-card__body&quot;&gt;
+          &lt;h2&gt;剧本模式&lt;/h2&gt;
+          &lt;p&gt;长篇叙事体验正在打磨中，敬请期待更宏大的沉浸式故事线。&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;footer class=&quot;mode-card__footer&quot;&gt;
+          &lt;span class=&quot;mode-tag&quot;&gt;未开放&lt;/span&gt;
+        &lt;/footer&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;mode-card mode-card--active&quot; data-target=&quot;舆情游戏菜单&quot;&gt;
+        &lt;div class=&quot;mode-card__art mode-card__art--yuqing&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;mode-card__body&quot;&gt;
+          &lt;h2&gt;舆情游戏&lt;/h2&gt;
+          &lt;p&gt;进入每周更新的舆情推演剧本，练习情境判断与危机处理决策。&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;footer class=&quot;mode-card__footer&quot;&gt;
+          &lt;span class=&quot;mode-tag mode-tag--primary&quot;&gt;立即进入&lt;/span&gt;
+        &lt;/footer&gt;
+      &lt;/article&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 交互脚本：将可点击卡片跳转到对应模式主菜单 --&gt;
+&lt;&lt;script&gt;&gt;
+(function () {
+  /* 监听模式卡片的点击事件，将 data-target 指向的 passage 作为模式入口。
+   * 若后续新增模式，请为卡片补充 data-target 并在这里复用逻辑即可。 */
+  $(document).one(&#x27;:passagedisplay&#x27;, function () {
+    $(&#x27;.mode-card--active[data-target]&#x27;).on(&#x27;click&#x27;, function () {
+      var target = $(this).data(&#x27;target&#x27;);
+      if (target) {
+        Engine.play(target);
+      }
+    });
+  });
+})();
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="2" name="StoryCaption" tags="" position="1400,100" size="100,100"></tw-passagedata><tw-passagedata pid="3" name="StoryInit" tags="" position="1200,100" size="100,100">&lt;&lt;set $MENU_PASSAGE = &quot;Main&quot;&gt;&gt;
 &lt;&lt;cacheaudio &quot;bgm1&quot; &quot;assets/img/music.mp3&quot;&gt;&gt;
 
 &lt;&lt;script&gt;&gt;
 (function () {
   // 启动时把本地存的用户名放进 State，供水印/登录判断使用
-  var saved = localStorage.getItem(&#39;tw_user&#39;);
+  var saved = localStorage.getItem(&#x27;tw_user&#x27;);
   if (saved) { State.variables.user = saved; }
 })();
 &lt;&lt;/script&gt;&gt;
-</tw-passagedata><tw-passagedata pid="4" name="StoryMenu" tags="nobr" position="1100,100" size="100,100">::StoryMenu</tw-passagedata><tw-passagedata pid="5" name="StorySubtitle" tags="" position="1500,100" size="100,100">&lt;&lt;link &quot;音乐开&quot;&gt;&gt;
+
+&lt;&lt;script&gt;&gt;
+/* 舆情剧本清单：按时间倒序维护，数组最前面的即为最新内容。
+ * startPassage 对应剧本第一个节点的 passage 名称；
+ * passages 用于在 UI 上展示节点串联关系，可按真实剧情顺序调整。 */
+State.variables.yuqingStories = [
+  {
+    id: &#x27;week-2024-02&#x27;,
+    title: &#x27;示例剧本：指挥链上的风暴&#x27;,
+    summary: &#x27;围绕突发公共安全事件的多节点推演练习。&#x27;,
+    startPassage: &#x27;剧情1&#x27;,
+    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;, &#x27;剧情3&#x27;, &#x27;剧情4&#x27;],
+    release: &#x27;2024-03-25&#x27;
+  },
+  {
+    id: &#x27;week-2024-01&#x27;,
+    title: &#x27;危机回声：校园舆情应对&#x27;,
+    summary: &#x27;处理校园突发事件舆情，协调多部门高压响应。&#x27;,
+    startPassage: &#x27;剧情1&#x27;,
+    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;, &#x27;剧情3&#x27;],
+    release: &#x27;2024-03-18&#x27;
+  },
+  {
+    id: &#x27;week-2024-00&#x27;,
+    title: &#x27;训练回顾：危机公关基础&#x27;,
+    summary: &#x27;复盘早期教学案例，巩固舆情应对话术与流程。&#x27;,
+    startPassage: &#x27;剧情1&#x27;,
+    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;],
+    release: &#x27;2024-02-20&#x27;
+  }
+];
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="4" name="StoryMenu" tags="nobr" position="1100,100" size="100,100">::StoryMenu</tw-passagedata><tw-passagedata pid="5" name="StorySubtitle" tags="" position="1500,100" size="100,100">&lt;&lt;link &quot;音乐开&quot;&gt;&gt;
 	&lt;&lt;audio &quot;bgm4&quot; play&gt;&gt;
 &lt;&lt;/link&gt;&gt;
 &lt;&lt;link &quot;音乐关&quot;&gt;&gt;
@@ -2372,7 +2573,257 @@ Text Interaction Box</tw-passagedata><tw-passagedata pid="7" name="widget" tags=
 })();
 &lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</tw-passagedata><tw-passagedata pid="19" name="Login" tags="" position="700,100" size="100,100">&lt;div class=&quot;login-panel&quot;&gt;
+&lt;/html&gt;</tw-passagedata><tw-passagedata pid="20" name="舆情游戏菜单" tags="" position="800,200" size="100,100">&lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
+
+&lt;style&gt;
+  .yuqing-screen {
+    min-height: 100vh;
+    padding: 5vh 6vw 8vh;
+    box-sizing: border-box;
+    color: #e5ecff;
+    font-family: &#x27;Source Han Sans&#x27;, &#x27;Microsoft YaHei&#x27;, sans-serif;
+    background: linear-gradient(140deg, rgba(9, 21, 48, 0.96), rgba(7, 12, 26, 0.96)),
+                url(&#x27;assets/img/1&#x27;) center/cover no-repeat fixed;
+    backdrop-filter: blur(6px);
+  }
+
+  .yuqing-header h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .yuqing-header p {
+    margin: 0.5rem 0 0;
+    max-width: 62ch;
+    line-height: 1.7;
+    opacity: 0.8;
+  }
+
+  .yuqing-section-title {
+    margin: 3.5rem 0 1.5rem;
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+  }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .story-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 2rem;
+    border-radius: 24px;
+    background: rgba(18, 32, 68, 0.75);
+    border: 1px solid rgba(112, 168, 255, 0.35);
+    box-shadow: 0 20px 45px rgba(5, 12, 28, 0.55);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .story-card::after {
+    content: &#x27;&#x27;;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(98, 176, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .story-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 60px rgba(10, 24, 54, 0.65);
+    border-color: rgba(130, 192, 255, 0.6);
+  }
+
+  .story-card:hover::after {
+    opacity: 1;
+  }
+
+  .story-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    opacity: 0.75;
+  }
+
+  .story-title {
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .story-summary {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    opacity: 0.85;
+  }
+
+  .story-path {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .story-node {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(70, 120, 255, 0.25);
+    border: 1px solid rgba(110, 170, 255, 0.4);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .archive {
+    margin-top: 3rem;
+    background: rgba(10, 18, 38, 0.75);
+    border-radius: 20px;
+    border: 1px solid rgba(88, 140, 220, 0.3);
+    padding: 1.6rem 2rem;
+  }
+
+  .archive summary {
+    cursor: pointer;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .archive-grid {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .archive-item {
+    padding: 1.5rem;
+    border-radius: 18px;
+    background: rgba(18, 32, 68, 0.6);
+    border: 1px solid rgba(112, 168, 255, 0.25);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .archive-item:hover {
+    transform: translateY(-4px);
+    border-color: rgba(130, 192, 255, 0.55);
+  }
+
+  .empty-hint {
+    margin: 1rem 0 0;
+    opacity: 0.65;
+  }
+
+  @media (max-width: 720px) {
+    .yuqing-screen {
+      padding: 4vh 1.5rem 6vh;
+    }
+
+    .story-card {
+      padding: 1.6rem;
+    }
+  }
+&lt;/style&gt;
+
+&lt;div class=&quot;yuqing-screen&quot;&gt;
+  &lt;header class=&quot;yuqing-header&quot;&gt;
+    &lt;h1&gt;舆情游戏剧本库&lt;/h1&gt;
+    &lt;p&gt;最新剧本将优先展示在下方两个焦点卡片中，其余内容收录于往期剧本档案，便于团队复盘与培训。&lt;/p&gt;
+  &lt;/header&gt;
+
+  &lt;p class=&quot;yuqing-section-title&quot;&gt;最新剧本&lt;/p&gt;
+  &lt;section class=&quot;story-grid&quot; id=&quot;latest-story-grid&quot;&gt;
+    &lt;!-- 最新剧本卡片将通过下面的脚本注入 --&gt;
+  &lt;/section&gt;
+
+  &lt;div class=&quot;archive&quot;&gt;
+    &lt;details&gt;
+      &lt;summary&gt;往期剧本&lt;/summary&gt;
+      &lt;div class=&quot;archive-grid&quot; id=&quot;archive-story-grid&quot;&gt;&lt;/div&gt;
+    &lt;/details&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;&lt;script&gt;&gt;
+(function () {
+  /* 根据 StoryInit 中维护的 State.variables.yuqingStories 构建菜单。
+   * 每个剧本对象结构：
+   *   { id, title, summary, startPassage, passages, release }
+   * - startPassage: 点击剧本卡片后 Engine.play 的目标入口。
+   * - passages: 展示节点串联顺序，可根据实际剧情更新。 */
+  $(document).one(&#x27;:passagedisplay&#x27;, function () {
+    var stories = State.variables.yuqingStories || [];
+    var latest = stories.slice(0, 2);
+    var archive = stories.slice(2);
+
+    var latestContainer = $(&#x27;#latest-story-grid&#x27;);
+    var archiveContainer = $(&#x27;#archive-story-grid&#x27;);
+
+    if (!latest.length) {
+      latestContainer.append(&#x27;&lt;p class=&quot;empty-hint&quot;&gt;暂无最新剧本，敬请期待新内容上线。&lt;/p&gt;&#x27;);
+    }
+
+    latest.forEach(function (story) {
+      latestContainer.append(renderStoryCard(story, &#x27;story-card&#x27;));
+    });
+
+    if (!archive.length) {
+      archiveContainer.append(&#x27;&lt;p class=&quot;empty-hint&quot;&gt;暂无往期剧本。&lt;/p&gt;&#x27;);
+    } else {
+      archive.forEach(function (story) {
+        archiveContainer.append(renderStoryCard(story, &#x27;archive-item&#x27;));
+      });
+    }
+
+    $(&#x27;[data-start]&#x27;).on(&#x27;click&#x27;, function () {
+      var target = $(this).data(&#x27;start&#x27;);
+      if (target) {
+        Engine.play(target);
+      }
+    });
+  });
+
+  function renderStoryCard(story, baseClass) {
+    var passages = Array.isArray(story.passages) ? story.passages : [];
+    var nodeHtml = passages.length
+      ? &#x27;&lt;ul class=&quot;story-path&quot;&gt;&#x27; + passages.map(function (name) {
+          return &#x27;&lt;li class=&quot;story-node&quot;&gt;&#x27; + name + &#x27;&lt;/li&gt;&#x27;;
+        }).join(&#x27;&#x27;) + &#x27;&lt;/ul&gt;&#x27;
+      : &#x27;&#x27;;
+
+    var release = story.release
+      ? &#x27;&lt;div class=&quot;story-meta&quot;&gt;&lt;span&gt;发布日期&lt;/span&gt;&lt;span&gt;&#x27; + story.release + &#x27;&lt;/span&gt;&lt;/div&gt;&#x27;
+      : &#x27;&#x27;;
+
+    return [
+      &#x27;&lt;article class=&quot;&#x27; + baseClass + &#x27;&quot; data-start=&quot;&#x27; + (story.startPassage || &#x27;&#x27;) + &#x27;&quot;&gt;&#x27;,
+      release ? &#x27;  &#x27; + release : &#x27;&#x27;,
+      &#x27;  &lt;h2 class=&quot;story-title&quot;&gt;&#x27; + (story.title || &#x27;未命名剧本&#x27;) + &#x27;&lt;/h2&gt;&#x27;,
+      story.summary ? &#x27;  &lt;p class=&quot;story-summary&quot;&gt;&#x27; + story.summary + &#x27;&lt;/p&gt;&#x27; : &#x27;&#x27;,
+      nodeHtml,
+      &#x27;&lt;/article&gt;&#x27;
+    ].filter(Boolean).join(&#x27;
+&#x27;);
+  }
+})();
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="19" name="Login" tags="" position="700,100" size="100,100">&lt;div class=&quot;login-panel&quot;&gt;
   &lt;h2&gt;登录&lt;/h2&gt;
   &lt;input id=&quot;lg-user&quot; placeholder=&quot;用户名&quot;&gt;
   &lt;input id=&quot;lg-pass&quot; type=&quot;password&quot; placeholder=&quot;密码&quot;&gt;
