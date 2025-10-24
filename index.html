@@ -339,7 +339,7 @@ body.is-login::after {
 #wm { position: fixed; inset: 0; pointer-events: none; z-index: 9999; transform: rotate(-20deg); }
 #wm .cell { text-align: center; white-space: nowrap; user-select: none; }
 
-/* 主模式选择界面 */
+/* 主模式选择界面（支持自定义背景图片，详见 setup.MenuAssets.mainBackground） */
 .mode-shell {
   display: grid;
   grid-template-columns: 1.02fr 1fr;
@@ -347,6 +347,20 @@ body.is-login::after {
   align-items: stretch;
   width: 100%;
   position: relative;
+  overflow: hidden;
+  --mode-background-image: none;
+}
+
+.mode-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--mode-background-image);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.38;
+  filter: saturate(1.1);
+  z-index: -2;
 }
 
 .mode-shell::after {
@@ -400,13 +414,14 @@ body.is-login::after {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(26px, 3.2vw, 36px);
-  border-radius: 28px;
-  background: linear-gradient(150deg, rgba(16, 26, 58, 0.92), rgba(11, 20, 46, 0.88));
+  justify-content: center;
+  padding: clamp(28px, 3.4vw, 42px);
+  border-radius: 32px;
+  background: linear-gradient(150deg, rgba(16, 26, 58, 0.9), rgba(11, 20, 46, 0.88));
   border: 1px solid rgba(120, 150, 255, 0.26);
-  box-shadow: 0 30px 82px rgba(7, 14, 34, 0.55);
-  min-height: clamp(270px, 30vh, 360px);
+  box-shadow: 0 32px 90px rgba(7, 14, 34, 0.58);
+  min-height: clamp(320px, 34vh, 420px);
+  overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
@@ -414,9 +429,36 @@ body.is-login::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 22%, rgba(120, 200, 255, 0.2), transparent 62%);
+  background: radial-gradient(circle at 30% 22%, rgba(120, 200, 255, 0.18), transparent 60%);
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.mode-tile__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: none;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.05);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.mode-tile.has-image .mode-tile__art {
+  opacity: 0.55;
+}
+
+.mode-tile__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(18px, 2vw, 28px);
+  height: 100%;
+  z-index: 1;
 }
 
 .mode-tile__head {
@@ -493,6 +535,410 @@ body.is-login::after {
   color: rgba(195, 202, 230, 0.55);
 }
 
+.mode-tip {
+  margin-top: clamp(16px, 2vw, 24px);
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: rgba(210, 220, 255, 0.68);
+}
+
+/* 舆情模式菜单（剧本封面 + 往期列表，图片地址由 setup.MenuAssets.* 控制） */
+.yuqing-screen {
+  position: relative;
+  width: 100%;
+  min-height: min(94vh, 920px);
+  box-sizing: border-box;
+  padding: clamp(32px, 6vw, 68px);
+  color: #e7ecff;
+  font-family: 'Source Han Sans', 'Microsoft YaHei', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(30px, 4vw, 48px);
+  border-radius: clamp(24px, 3vw, 36px);
+  background: rgba(10, 16, 34, 0.85);
+  overflow: hidden;
+  --yuqing-bg-image: none;
+}
+
+.yuqing-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--yuqing-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.62) saturate(1.08);
+  opacity: 0.4;
+  z-index: -2;
+}
+
+.yuqing-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 22% 18%, rgba(110, 168, 255, 0.32), transparent 60%),
+              radial-gradient(circle at 82% 80%, rgba(255, 142, 198, 0.28), transparent 62%),
+              linear-gradient(140deg, rgba(8, 16, 36, 0.85), rgba(6, 12, 28, 0.9));
+  z-index: -1;
+}
+
+.yuqing-header {
+  position: relative;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yuqing-header h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 3.2vw, 3.4rem);
+  font-weight: 600;
+}
+
+.yuqing-header p {
+  margin: 0;
+  line-height: 1.75;
+  color: rgba(226, 234, 255, 0.82);
+  max-width: 60ch;
+}
+
+.yuqing-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, clamp(260px, 26vw, 340px)) 1fr;
+  gap: clamp(28px, 4vw, 52px);
+  padding: clamp(28px, 3.4vw, 46px);
+  border-radius: 32px;
+  background: rgba(14, 24, 56, 0.85);
+  border: 1px solid rgba(120, 168, 255, 0.32);
+  box-shadow: 0 28px 80px rgba(6, 12, 32, 0.6);
+  overflow: hidden;
+}
+
+.yuqing-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 18%, rgba(126, 188, 255, 0.25), transparent 62%),
+              radial-gradient(circle at 80% 80%, rgba(255, 160, 210, 0.22), transparent 64%);
+  opacity: 0.65;
+  z-index: 0;
+}
+
+.yuqing-hero__cover {
+  position: relative;
+  border-radius: 24px;
+  background-image: none;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 18px 40px rgba(5, 10, 24, 0.6);
+  min-height: clamp(260px, 32vw, 380px);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.yuqing-hero__cover::after {
+  content: '封面';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 0.85rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(10, 16, 34, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.yuqing-hero__info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vw, 20px);
+  z-index: 1;
+}
+
+.yuqing-hero__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.4vw, 2.2rem);
+  font-weight: 600;
+}
+
+.yuqing-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: rgba(210, 222, 255, 0.72);
+}
+
+.yuqing-hero__summary {
+  margin: 0;
+  line-height: 1.7;
+  color: rgba(228, 234, 255, 0.85);
+}
+
+.yuqing-hero__path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.yuqing-hero__node {
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(82, 136, 255, 0.28);
+  border: 1px solid rgba(138, 186, 255, 0.38);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+
+.yuqing-hero__start {
+  align-self: flex-start;
+  margin-top: clamp(12px, 2vw, 18px);
+  padding: 0.9rem 2.4rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(130, 206, 255, 0.95), rgba(96, 162, 255, 0.95));
+  color: #051026;
+  box-shadow: 0 20px 45px rgba(86, 146, 255, 0.45);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.yuqing-hero__start:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 26px 60px rgba(96, 162, 255, 0.5);
+}
+
+.yuqing-archive {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(110, 150, 240, 0.28);
+  background: rgba(10, 18, 38, 0.82);
+  box-shadow: 0 20px 60px rgba(5, 10, 24, 0.55);
+  padding: clamp(22px, 3vw, 32px) clamp(22px, 3vw, 36px);
+  z-index: 1;
+}
+
+.yuqing-archive h2 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(206, 218, 255, 0.75);
+}
+
+.yuqing-archive__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+}
+
+.yuqing-archive__empty {
+  margin: 0;
+  padding: 0.6rem 0;
+  color: rgba(208, 220, 255, 0.7);
+  letter-spacing: 0.04em;
+}
+
+.yuqing-archive__item {
+  position: relative;
+  border-radius: 20px;
+  padding: 1.2rem 1.4rem;
+  background: linear-gradient(145deg, rgba(18, 30, 64, 0.88), rgba(16, 24, 52, 0.88));
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.yuqing-archive__item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(136, 190, 255, 0.5);
+  box-shadow: 0 18px 36px rgba(8, 16, 36, 0.45);
+}
+
+.yuqing-archive__title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #f1f4ff;
+}
+
+.yuqing-archive__meta {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: rgba(210, 220, 255, 0.68);
+  letter-spacing: 0.04em;
+}
+
+/* 剧本对话框架（小说式对话，图片路径在 setup.MenuAssets 与场景数组中配置） */
+.novel-stage {
+  position: relative;
+  min-height: 100vh;
+  color: #f4f8ff;
+  font-family: 'Source Han Sans', 'Microsoft YaHei', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  overflow: hidden;
+  background: #050a16;
+  --novel-background: none;
+}
+
+.novel-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--novel-background);
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.7) saturate(1.05);
+  z-index: 0;
+  transition: background-image 0.35s ease, filter 0.35s ease;
+}
+
+.novel-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 10, 24, 0.15) 0%, rgba(6, 10, 24, 0.65) 55%, rgba(6, 10, 24, 0.9) 100%);
+  z-index: 1;
+}
+
+.novel-stage__inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: clamp(32px, 4vw, 48px);
+}
+
+.novel-standing {
+  position: absolute;
+  bottom: 240px;
+  width: min(32vw, 420px);
+  max-width: 420px;
+  aspect-ratio: 3 / 5;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center bottom;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.novel-standing.is-visible {
+  opacity: 1;
+}
+
+.novel-standing--left {
+  left: clamp(4vw, 10vw, 12vw);
+}
+
+.novel-standing--right {
+  right: clamp(4vw, 10vw, 12vw);
+}
+
+.novel-dialog {
+  position: relative;
+  border-radius: 26px;
+  padding: clamp(26px, 3vw, 36px);
+  background: rgba(10, 16, 34, 0.82);
+  border: 1px solid rgba(126, 172, 255, 0.3);
+  box-shadow: 0 24px 70px rgba(4, 10, 24, 0.6);
+  min-height: 220px;
+}
+
+.novel-dialog__name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  color: rgba(194, 210, 255, 0.95);
+}
+
+.novel-dialog__text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  min-height: 120px;
+  white-space: pre-wrap;
+}
+
+.novel-dialog__next {
+  align-self: flex-end;
+  margin-left: auto;
+  margin-top: 1rem;
+  padding: 0.75rem 2.4rem;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, rgba(130, 206, 255, 0.95), rgba(94, 154, 255, 0.95));
+  color: #051026;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(88, 146, 255, 0.45);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.novel-dialog__next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 60px rgba(94, 154, 255, 0.48);
+}
+
+.novel-choices {
+  display: none;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1.2rem;
+}
+
+.novel-choices.is-visible {
+  display: flex;
+}
+
+.novel-choice {
+  padding: 0.6rem 1.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(150, 190, 255, 0.4);
+  background: rgba(18, 28, 56, 0.85);
+  color: #eef3ff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.novel-choice:hover {
+  transform: translateY(-2px);
+  border-color: rgba(182, 214, 255, 0.6);
+  box-shadow: 0 16px 32px rgba(6, 12, 30, 0.5);
+}
+
+.novel-helper {
+  font-size: 0.85rem;
+  color: rgba(210, 220, 255, 0.68);
+  letter-spacing: 0.08em;
+  margin-top: 0.5rem;
+}
+
+.novel-stage.is-clickable {
+  cursor: pointer;
+}
+
 @media (max-width: 1366px) {
   body { font-size: 15px; }
   .app-viewport { border-radius: 24px; }
@@ -501,6 +947,9 @@ body.is-login::after {
 @media (max-width: 1100px) {
   .mode-shell { grid-template-columns: 1fr; }
   .mode-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mode-shell { --mode-background-image: none; }
+  .yuqing-hero { grid-template-columns: 1fr; }
+  .yuqing-hero__cover { min-height: 240px; }
   .login-layout { flex-direction: column; }
   .login-hero { display: none; }
   body { overflow: auto; }
@@ -508,7 +957,25 @@ body.is-login::after {
 
 @media (max-width: 920px) {
   .mode-tiles { grid-template-columns: 1fr; }
+  .yuqing-screen { padding: 28px 24px 40px; border-radius: 22px; }
+  .yuqing-archive__list { grid-template-columns: 1fr; }
+  .yuqing-archive__item { padding: 1rem 1.2rem; }
+  .novel-standing { width: 58vw; bottom: 180px; }
+  .novel-dialog { padding: 22px; }
+  .novel-dialog__text { min-height: 100px; }
+  .novel-stage__inner { padding: 28px 20px 36px; }
   body { overflow: auto; }
+}
+
+@media (max-width: 640px) {
+  .yuqing-screen { padding: 24px 18px 34px; border-radius: 18px; }
+  .yuqing-hero { gap: 22px; padding: 24px; }
+  .yuqing-hero__cover::after { left: 12px; top: 12px; }
+  .yuqing-archive { padding: 18px; }
+  .novel-dialog { padding: 18px; border-radius: 22px; }
+  .novel-dialog__next { width: 100%; text-align: center; }
+  .novel-standing { width: 70vw; bottom: 160px; }
+  .novel-helper { font-size: 0.8rem; }
 }
 </style><script role="script" id="twine-user-script" type="text/twine-javascript">/* ========= 起点与存档/回退配置 ========= */
 Config.passages.start = 'Login';
@@ -529,6 +996,41 @@ setup.WM = {
   rowHeight: 120,  // 密度（行高，像素）：越小越密
   fontSize: 22,    // 字号（像素）
   color: '#000000' // 颜色：HEX 或 rgb/rgba
+};
+
+/* ========= 图片资源统一入口 =========
+ * 说明：下面列出的路径都可以直接替换为自己的图片（支持相对路径或在线地址）。
+ *       只需修改引号里的文字，无需懂代码。保留空字符串表示使用默认渐变背景。 ========= */
+setup.MenuAssets = {
+  mainBackground: '',        // 主菜单模式选择页背景图（建议 16:9 大图）
+  storyModeTile: '',         // “剧本模式”卡片背景图
+  yuqingModeTile: '',        // “舆情推演”卡片背景图
+  yuqingBackground: '',      // 舆情模式菜单背景图
+  yuqingDefaultCover: '',    // 舆情剧本默认封面（当单个剧本未设置 cover 时使用）
+  novelDefaultBackground: '',// 舆情剧本内页默认背景
+  novelLeftStand: '',        // 对话框默认左侧立绘
+  novelRightStand: ''        // 对话框默认右侧立绘
+};
+
+setup.getAsset = function (key, fallback) {
+  var lib = setup.MenuAssets || {};
+  var value = lib[key];
+  if (typeof value === 'string') {
+    var trimmed = value.trim();
+    if (trimmed.length) { return trimmed; }
+  }
+  return fallback || '';
+};
+
+setup.NovelDefaults = {
+  typeSpeed: 36, // 打字机速度（毫秒，数值越小越快）
+  getBackground: function () { return setup.getAsset('novelDefaultBackground', ''); },
+  getStand: function (side) {
+    if (side === 'right') {
+      return setup.getAsset('novelRightStand', '');
+    }
+    return setup.getAsset('novelLeftStand', '');
+  }
 };
 
 /* ========= 关键节点/结局打点（姓名=登录账号；不再弹窗） ========= */
@@ -717,6 +1219,262 @@ setup.renderWatermark = function (name) {
   document.body.appendChild(w);
 };
 
+/* ========= 剧本对话框渲染工具（打字机 + 立绘切换） ========= */
+setup.NovelPlayer = (function () {
+  function escapeHtml (str) {
+    return String(str).replace(/[&<>"']/g, function (ch) {
+      switch (ch) {
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return ch;
+      }
+    });
+  }
+
+  function formatText (str) {
+    if (str == null) { return ''; }
+    return escapeHtml(String(str)).replace(/\n/g, '<br>');
+  }
+
+  function setBackground (stage, url, defaults) {
+    var chosen = (typeof url === 'string' && url.trim().length) ? url.trim() : '';
+    if (!chosen && defaults && typeof defaults.getBackground === 'function') {
+      chosen = defaults.getBackground() || '';
+    }
+    stage.style.setProperty('--novel-background', chosen ? 'url(' + chosen + ')' : 'none');
+  }
+
+  function setStand (element, image) {
+    if (!element) { return; }
+    var value = (typeof image === 'string' && image.trim().length) ? image.trim() : '';
+    if (value) {
+      element.style.backgroundImage = 'url(' + value + ')';
+      element.classList.add('is-visible');
+      element.setAttribute('data-current', value);
+    } else {
+      element.style.backgroundImage = 'none';
+      element.classList.remove('is-visible');
+      element.removeAttribute('data-current');
+    }
+  }
+
+  function resolveStand (side, scene, defaults, leftEl, rightEl) {
+    var value;
+    if (scene && scene.stands && Object.prototype.hasOwnProperty.call(scene.stands, side)) {
+      value = scene.stands[side];
+    } else if (scene && scene.stand && scene.side === side) {
+      value = scene.stand;
+    } else if (scene && scene.keepPrevious === true) {
+      var holder = side === 'right' ? rightEl : leftEl;
+      if (holder) {
+        value = holder.getAttribute('data-current') || holder.dataset.current || '';
+      }
+    }
+
+    if (scene && scene.clearOthers === true && scene.side !== side && !(scene.stands && Object.prototype.hasOwnProperty.call(scene.stands, side))) {
+      value = '';
+    }
+
+    if ((!value || !String(value).trim().length) && !(scene && scene.hideDefault === true) && defaults && typeof defaults.getStand === 'function') {
+      value = defaults.getStand(side) || '';
+    }
+
+    return (typeof value === 'string') ? value.trim() : '';
+  }
+
+  function setHelper (el, state) {
+    if (!el) { return; }
+    var text = '';
+    switch (state) {
+      case 'typing': text = '点击对话框可跳过播放'; break;
+      case 'choices': text = '请选择下一步动作'; break;
+      default: text = '点击对话框或按钮继续'; break;
+    }
+    el.textContent = text;
+  }
+
+  function mount (stageRef, scenes, options) {
+    var stage = typeof stageRef === 'string' ? document.getElementById(stageRef) : stageRef;
+    if (!stage || !Array.isArray(scenes) || scenes.length === 0) { return; }
+
+    var defaults = setup.NovelDefaults || {};
+    var opts = options || {};
+    var typeSpeed = (typeof opts.typeSpeed === 'number' && opts.typeSpeed > 0) ? opts.typeSpeed : (typeof defaults.typeSpeed === 'number' ? defaults.typeSpeed : 40);
+    var endPassage = typeof opts.endPassage === 'string' ? opts.endPassage : '舆情游戏菜单';
+    var endButtonLabel = typeof opts.endButtonLabel === 'string' ? opts.endButtonLabel : '返回菜单';
+
+    var nameEl = stage.querySelector('[data-role="speaker"]');
+    var textEl = stage.querySelector('[data-role="text"]');
+    var nextBtn = stage.querySelector('[data-role="next"]');
+    var helperEl = stage.querySelector('[data-role="helper"]');
+    var choicesEl = stage.querySelector('[data-role="choices"]');
+    var leftStand = stage.querySelector('[data-role="stand-left"]');
+    var rightStand = stage.querySelector('[data-role="stand-right"]');
+
+    var scenesList = scenes.slice();
+    var index = 0;
+    var isTyping = false;
+    var skipTyping = false;
+    var timer = null;
+    var currentScene = null;
+
+    function stopTimer () {
+      if (timer) { clearTimeout(timer); timer = null; }
+    }
+
+    function typeText (content, done) {
+      var chars = Array.from(String(content || ''));
+      var collected = '';
+      var pointer = 0;
+      isTyping = true;
+      skipTyping = false;
+      setHelper(helperEl, 'typing');
+      textEl.innerHTML = '';
+
+      function step () {
+        if (skipTyping) {
+          collected = chars.join('');
+          textEl.innerHTML = formatText(collected);
+          finish();
+          return;
+        }
+        if (pointer < chars.length) {
+          collected += chars[pointer++];
+          textEl.innerHTML = formatText(collected);
+          timer = window.setTimeout(step, typeSpeed);
+        } else {
+          finish();
+        }
+      }
+
+      function finish () {
+        stopTimer();
+        isTyping = false;
+        skipTyping = false;
+        setHelper(helperEl, currentScene && currentScene.choices && currentScene.choices.length ? 'choices' : 'ready');
+        if (typeof done === 'function') { done(); }
+      }
+
+      step();
+    }
+
+    function renderChoices (scene) {
+      if (!choicesEl) { return; }
+      choicesEl.innerHTML = '';
+      choicesEl.classList.remove('is-visible');
+      var choiceList = Array.isArray(scene.choices) ? scene.choices : [];
+      if (!choiceList.length) { return; }
+      choiceList.forEach(function (choice) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'novel-choice';
+        btn.textContent = choice && choice.text ? choice.text : '继续';
+        btn.addEventListener('click', function () {
+          if (choice && typeof choice.onSelect === 'function') {
+            try { choice.onSelect(); } catch (err) {}
+          }
+          if (choice && choice.passage) {
+            Engine.play(choice.passage);
+          }
+        });
+        choicesEl.appendChild(btn);
+      });
+      choicesEl.classList.add('is-visible');
+      setHelper(helperEl, 'choices');
+    }
+
+    function finishStory () {
+      if (typeof opts.onEnd === 'function') {
+        try { opts.onEnd(); } catch (err) {}
+      }
+      if (currentScene && currentScene.nextPassage) {
+        Engine.play(currentScene.nextPassage);
+        return;
+      }
+      if (endPassage) {
+        Engine.play(endPassage);
+      }
+    }
+
+    function updateControls () {
+      var hasChoices = currentScene && Array.isArray(currentScene.choices) && currentScene.choices.length > 0;
+      if (choicesEl) {
+        if (!hasChoices) {
+          choicesEl.classList.remove('is-visible');
+          choicesEl.innerHTML = '';
+        }
+      }
+      if (nextBtn) {
+        if (hasChoices) {
+          nextBtn.style.display = 'none';
+        } else {
+          nextBtn.style.display = '';
+          if (index >= scenesList.length - 1) {
+            nextBtn.textContent = currentScene && currentScene.nextLabel ? currentScene.nextLabel : endButtonLabel;
+          } else {
+            nextBtn.textContent = currentScene && currentScene.nextLabel ? currentScene.nextLabel : '下一段';
+          }
+        }
+      }
+    }
+
+    function showScene () {
+      stopTimer();
+      currentScene = scenesList[index];
+      if (!currentScene) { return; }
+
+      setBackground(stage, currentScene.background, defaults);
+      var leftImage = resolveStand('left', currentScene, defaults, leftStand, rightStand);
+      var rightImage = resolveStand('right', currentScene, defaults, leftStand, rightStand);
+      setStand(leftStand, leftImage);
+      setStand(rightStand, rightImage);
+
+      if (nameEl) { nameEl.textContent = currentScene.speaker || currentScene.name || ''; }
+
+      renderChoices({ choices: [] });
+      updateControls();
+
+      typeText(currentScene.text || '', function () {
+        renderChoices(currentScene);
+        updateControls();
+      });
+    }
+
+    function advance () {
+      if (isTyping) {
+        skipTyping = true;
+        return;
+      }
+      if (index < scenesList.length - 1) {
+        index += 1;
+        showScene();
+      } else if (!(currentScene && currentScene.choices && currentScene.choices.length)) {
+        finishStory();
+      }
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        advance();
+      });
+    }
+
+    stage.addEventListener('click', function (ev) {
+      if (ev.target.closest('.novel-choice') || ev.target.closest('[data-role="choices"]')) { return; }
+      if (nextBtn && ev.target === nextBtn) { return; }
+      advance();
+    });
+
+    stage.classList.add('is-clickable');
+    showScene();
+  }
+
+  return { mount: mount };
+})();
+
 /* ===== Login UI：渲染完成后再绑定事件 + 背景切换 ===== */
 $(document).on(':passagedisplay', function (ev) {
   const isLogin = ev.passage && ev.passage.title === 'Login';
@@ -795,51 +1553,79 @@ $(document).on(':passagedisplay', function () {
 </script><tw-tag name="body" color="red"></tw-tag><tw-tag name="body&#39;" color="red"></tw-tag><tw-tag name="body1" color="red"></tw-tag><tw-tag name="body2" color="red"></tw-tag><tw-tag name="全身而退" color="green"></tw-tag><tw-tag name="铁饭碗" color="orange"></tw-tag><tw-tag name="燃起来了" color="red"></tw-tag><tw-tag name="信徒" color="purple"></tw-tag><tw-passagedata pid="1" name="Main" tags="" position="700,200" size="100,100">&lt;&lt;if Save.browser.size &gt; 0&gt;&gt;
     &lt;&lt;run Save.browser.continue().catch(()=&gt;null)&gt;&gt;
 &lt;&lt;endif&gt;&gt;
-&lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
+  &lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
 
-&lt;!-- 模式选择主界面 --&gt;
-&lt;div class=&quot;app-viewport app-viewport--main&quot;&gt;
-  &lt;div class=&quot;app-viewport__inner mode-shell&quot;&gt;
-    &lt;section class=&quot;mode-meta&quot;&gt;
-      &lt;p class=&quot;mode-meta__eyebrow&quot;&gt;MODE SELECT&lt;/p&gt;
-      &lt;h1&gt;危机演练中心&lt;/h1&gt;
-      &lt;p class=&quot;mode-meta__copy&quot;&gt;整合剧本训练与舆情推演，一站式管理最新演练内容。&lt;/p&gt;
-    &lt;/section&gt;
-    &lt;section class=&quot;mode-tiles&quot;&gt;
-      &lt;article class=&quot;mode-tile is-disabled&quot; aria-disabled=&quot;true&quot;&gt;
-        &lt;div class=&quot;mode-tile__head&quot;&gt;
-          &lt;h2&gt;剧本模式&lt;/h2&gt;
-          &lt;p&gt;长篇沉浸式剧本正在制作中，上线后可体验完整危机叙事链路。&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;mode-tile__footer&quot;&gt;
-          &lt;span class=&quot;mode-chip&quot;&gt;未开放&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/article&gt;
-      &lt;article class=&quot;mode-tile is-active&quot; data-target=&quot;舆情游戏菜单&quot;&gt;
-        &lt;div class=&quot;mode-tile__head&quot;&gt;
-          &lt;h2&gt;舆情推演&lt;/h2&gt;
-          &lt;p&gt;进入每周更新的情境演练，检验舆情识别、应对与复盘能力。&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;mode-tile__footer&quot;&gt;
-          &lt;span class=&quot;mode-chip mode-chip--cta&quot;&gt;进入体验&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/article&gt;
-    &lt;/section&gt;
+  &lt;!-- 模式选择主界面（支持自定义背景与卡片图片） --&gt;
+  &lt;&lt;set _menuBg = setup.getAsset(&#x27;mainBackground&#x27;, &#x27;&#x27;)&gt;&gt;
+  &lt;&lt;set _storyTileImage = setup.getAsset(&#x27;storyModeTile&#x27;, &#x27;&#x27;)&gt;&gt;
+  &lt;&lt;set _yuqingTileImage = setup.getAsset(&#x27;yuqingModeTile&#x27;, &#x27;&#x27;)&gt;&gt;
+  &lt;div class=&quot;app-viewport app-viewport--main&quot;&gt;
+    &lt;div class=&quot;app-viewport__inner mode-shell&quot; data-menu-bg=&quot;&lt;&lt;print _menuBg&gt;&gt;&quot;&gt;
+      &lt;section class=&quot;mode-meta&quot;&gt;
+        &lt;p class=&quot;mode-meta__eyebrow&quot;&gt;MODE SELECT&lt;/p&gt;
+        &lt;h1&gt;危机演练中心&lt;/h1&gt;
+        &lt;p class=&quot;mode-meta__copy&quot;&gt;整合剧本训练与舆情推演，一站式管理最新演练内容。&lt;/p&gt;
+      &lt;/section&gt;
+      &lt;section class=&quot;mode-tiles&quot;&gt;
+        &lt;article class=&quot;mode-tile is-disabled&quot; aria-disabled=&quot;true&quot; data-tile-image=&quot;&lt;&lt;print _storyTileImage&gt;&gt;&quot;&gt;
+          &lt;figure class=&quot;mode-tile__art&quot; aria-hidden=&quot;true&quot;&gt;&lt;/figure&gt;
+          &lt;div class=&quot;mode-tile__content&quot;&gt;
+            &lt;div class=&quot;mode-tile__head&quot;&gt;
+              &lt;h2&gt;剧本模式&lt;/h2&gt;
+              &lt;p&gt;长篇沉浸式剧本正在制作中，上线后可体验完整危机叙事链路。&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;mode-tile__footer&quot;&gt;
+              &lt;span class=&quot;mode-chip&quot;&gt;未开放&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/article&gt;
+        &lt;article class=&quot;mode-tile is-active&quot; data-target=&quot;舆情游戏菜单&quot; data-tile-image=&quot;&lt;&lt;print _yuqingTileImage&gt;&gt;&quot;&gt;
+          &lt;figure class=&quot;mode-tile__art&quot; aria-hidden=&quot;true&quot;&gt;&lt;/figure&gt;
+          &lt;div class=&quot;mode-tile__content&quot;&gt;
+            &lt;div class=&quot;mode-tile__head&quot;&gt;
+              &lt;h2&gt;舆情推演&lt;/h2&gt;
+              &lt;p&gt;进入每周更新的情境演练，检验舆情识别、应对与复盘能力。&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;mode-tile__footer&quot;&gt;
+              &lt;span class=&quot;mode-chip mode-chip--cta&quot;&gt;进入体验&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/article&gt;
+      &lt;/section&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;mode-tip&quot;&gt;提示：主菜单与卡片图片可在 setup.MenuAssets 中一键替换。&lt;/p&gt;
   &lt;/div&gt;
-&lt;/div&gt;
 
-&lt;&lt;script&gt;&gt;
-(function () {
-  $(document).one(&#x27;:passagedisplay&#x27;, function () {
-    $(&#x27;.mode-tile.is-active[data-target]&#x27;).on(&#x27;click&#x27;, function () {
-      var target = $(this).data(&#x27;target&#x27;);
-      if (target) {
-        Engine.play(target);
-      }
+  &lt;&lt;script&gt;&gt;
+  (function () {
+    $(document).one(&#x27;:passagedisplay&#x27;, function () {
+      $(&#x27;.mode-shell[data-menu-bg]&#x27;).each(function () {
+        var bg = $(this).data(&#x27;menu-bg&#x27;);
+        if (typeof bg === &#x27;string&#x27; && bg.trim().length) {
+          $(this).css(&#x27;--mode-background-image&#x27;, &#x27;url(&#x27; + bg + &#x27;)&#x27;);
+        } else {
+          $(this).css(&#x27;--mode-background-image&#x27;, &#x27;none&#x27;);
+        }
+      });
+
+      $(&#x27;.mode-tile&#x27;).each(function () {
+        var $tile = $(this);
+        var img = $tile.data(&#x27;tile-image&#x27;);
+        if (typeof img === &#x27;string&#x27; && img.trim().length) {
+          $tile.addClass(&#x27;has-image&#x27;);
+          $tile.find(&#x27;.mode-tile__art&#x27;).css(&#x27;background-image&#x27;, &#x27;url(&#x27; + img + &#x27;)&#x27;);
+        }
+      });
+
+      $(&#x27;.mode-tile.is-active[data-target]&#x27;).on(&#x27;click&#x27;, function () {
+        var target = $(this).data(&#x27;target&#x27;);
+        if (target) {
+          Engine.play(target);
+        }
+      });
     });
-  });
-})();
-&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="2" name="StoryCaption" tags="" position="1400,100" size="100,100"></tw-passagedata><tw-passagedata pid="3" name="StoryInit" tags="" position="1200,100" size="100,100">&lt;&lt;set $MENU_PASSAGE = &quot;Main&quot;&gt;&gt;
+  })();
+  &lt;&lt;/script&gt;&gt;
 &lt;&lt;cacheaudio &quot;bgm1&quot; &quot;assets/img/music.mp3&quot;&gt;&gt;
 
 &lt;&lt;script&gt;&gt;
@@ -850,37 +1636,50 @@ $(document).on(':passagedisplay', function () {
 })();
 &lt;&lt;/script&gt;&gt;
 
-&lt;&lt;script&gt;&gt;
-/* 舆情剧本清单：按时间倒序维护，数组最前面的即为最新内容。
- * startPassage 对应剧本第一个节点的 passage 名称；
- * passages 用于在 UI 上展示节点串联关系，可按真实剧情顺序调整。 */
-State.variables.yuqingStories = [
-  {
-    id: &#x27;week-2024-02&#x27;,
-    title: &#x27;示例剧本：指挥链上的风暴&#x27;,
-    summary: &#x27;围绕突发公共安全事件的多节点推演练习。&#x27;,
-    startPassage: &#x27;剧情1&#x27;,
-    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;, &#x27;剧情3&#x27;, &#x27;剧情4&#x27;],
-    release: &#x27;2024-03-25&#x27;
-  },
-  {
-    id: &#x27;week-2024-01&#x27;,
-    title: &#x27;危机回声：校园舆情应对&#x27;,
-    summary: &#x27;处理校园突发事件舆情，协调多部门高压响应。&#x27;,
-    startPassage: &#x27;剧情1&#x27;,
-    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;, &#x27;剧情3&#x27;],
-    release: &#x27;2024-03-18&#x27;
-  },
-  {
-    id: &#x27;week-2024-00&#x27;,
-    title: &#x27;训练回顾：危机公关基础&#x27;,
-    summary: &#x27;复盘早期教学案例，巩固舆情应对话术与流程。&#x27;,
-    startPassage: &#x27;剧情1&#x27;,
-    passages: [&#x27;剧情1&#x27;, &#x27;剧情2&#x27;],
-    release: &#x27;2024-02-20&#x27;
+  &lt;&lt;script&gt;&gt;
+  /* 舆情剧本清单：只需在下方数组里增删对象即可。
+   * 字段说明：
+   *   - id：唯一标识（可随意命名，用于切换）；
+   *   - title / summary：展示在页面上的标题与简介；
+   *   - cover：封面图片路径（留空则使用默认）；
+   *   - startPassage：点击开始后要跳转的 Passage 名称；
+   *   - passages：仅用于展示节点流程，可填剧情节点或说明文字；
+   *   - release：发布日期或批次。
+   */
+  State.variables.yuqingStories = [
+    {
+      id: &#x27;week-2024-02&#x27;,
+      title: &#x27;示例剧本：指挥链上的风暴&#x27;,
+      summary: &#x27;围绕突发公共安全事件的多节点推演练习。&#x27;,
+      cover: &#x27;&#x27;, // 替换为最新封面图片，例如 assets/img/yuqing-2024-02.jpg
+      startPassage: &#x27;舆情剧本框架&#x27;,
+      passages: [&#x27;情境开场&#x27;, &#x27;危机升级&#x27;, &#x27;处置抉择&#x27;],
+      release: &#x27;2024-03-25&#x27;
+    },
+    {
+      id: &#x27;week-2024-01&#x27;,
+      title: &#x27;危机回声：校园舆情应对&#x27;,
+      summary: &#x27;处理校园突发事件舆情，协调多部门高压响应。&#x27;,
+      cover: &#x27;&#x27;, // 同上，可随时更新图片路径
+      startPassage: &#x27;舆情剧本框架&#x27;,
+      passages: [&#x27;舆情预警&#x27;, &#x27;公开回应&#x27;, &#x27;跟踪复盘&#x27;],
+      release: &#x27;2024-03-18&#x27;
+    },
+    {
+      id: &#x27;week-2024-00&#x27;,
+      title: &#x27;训练回顾：危机公关基础&#x27;,
+      summary: &#x27;复盘早期教学案例，巩固舆情应对话术与流程。&#x27;,
+      cover: &#x27;&#x27;,
+      startPassage: &#x27;舆情剧本框架&#x27;,
+      passages: [&#x27;情境回放&#x27;, &#x27;痛点总结&#x27;],
+      release: &#x27;2024-02-20&#x27;
+    }
+  ];
+  if (State.variables.yuqingStories.length &gt; 0) {
+    State.variables.currentYuqingStoryId = State.variables.yuqingStories[0].id;
   }
-];
-&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="4" name="StoryMenu" tags="nobr" position="1100,100" size="100,100">::StoryMenu</tw-passagedata><tw-passagedata pid="5" name="StorySubtitle" tags="" position="1500,100" size="100,100">&lt;&lt;link &quot;音乐开&quot;&gt;&gt;
+  &lt;&lt;/script&gt;&gt;
+</tw-passagedata><tw-passagedata pid="4" name="StoryMenu" tags="nobr" position="1100,100" size="100,100">::StoryMenu</tw-passagedata><tw-passagedata pid="5" name="StorySubtitle" tags="" position="1500,100" size="100,100">&lt;&lt;link &quot;音乐开&quot;&gt;&gt;
 	&lt;&lt;audio &quot;bgm4&quot; play&gt;&gt;
 &lt;&lt;/link&gt;&gt;
 &lt;&lt;link &quot;音乐关&quot;&gt;&gt;
@@ -2772,253 +3571,142 @@ Text Interaction Box</tw-passagedata><tw-passagedata pid="7" name="widget" tags=
 &lt;/body&gt;
 &lt;/html&gt;</tw-passagedata><tw-passagedata pid="20" name="舆情游戏菜单" tags="" position="800,200" size="100,100">&lt;&lt;audio &quot;bgm1&quot; loop volume 0.35 fadein&gt;&gt;
 
-&lt;style&gt;
-  .yuqing-screen {
-    min-height: 100vh;
-    padding: 5vh 6vw 8vh;
-    box-sizing: border-box;
-    color: #e5ecff;
-    font-family: &#x27;Source Han Sans&#x27;, &#x27;Microsoft YaHei&#x27;, sans-serif;
-    background: linear-gradient(140deg, rgba(9, 21, 48, 0.96), rgba(7, 12, 26, 0.96)),
-                url(&#x27;assets/img/1&#x27;) center/cover no-repeat fixed;
-    backdrop-filter: blur(6px);
+&lt;&lt;set _stories = State.variables.yuqingStories || []&gt;&gt;
+&lt;&lt;if _stories.length == 0&gt;&gt;
+  &lt;p&gt;暂未配置舆情剧本，请在 StoryInit 中维护 $yuqingStories 数组。&lt;/p&gt;
+&lt;&lt;else&gt;&gt;
+  &lt;&lt;run _currentStory = _stories.find(function(item){ return item.id === State.variables.currentYuqingStoryId; }) || _stories[0]; _archives = _stories.filter(function(item){ return item.id !== _currentStory.id; });&gt;&gt;
+  &lt;div class=&quot;yuqing-screen&quot; data-bg=&quot;&lt;&lt;print setup.getAsset('yuqingBackground', '')&gt;&gt;&quot;&gt;
+    &lt;header class=&quot;yuqing-header&quot;&gt;
+      &lt;p class=&quot;mode-meta__eyebrow&quot;&gt;PUBLIC OPINION&lt;/p&gt;
+      &lt;h1&gt;舆情推演工作台&lt;/h1&gt;
+      &lt;p&gt;挑选当期演练剧本，或回顾往期案例。需要更新时直接修改 StoryInit 中的剧本信息。&lt;/p&gt;
+    &lt;/header&gt;
+    &lt;section class=&quot;yuqing-hero&quot; data-cover=&quot;&lt;&lt;print _currentStory.cover || ''&gt;&gt;&quot;&gt;
+      &lt;div class=&quot;yuqing-hero__cover&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;yuqing-hero__info&quot;&gt;
+        &lt;div class=&quot;yuqing-hero__meta&quot;&gt;&lt;&lt;if _currentStory.release&gt;&gt;发布日期：&lt;&lt;print _currentStory.release&gt;&gt;&lt;&lt;else&gt;&gt;当前剧本&lt;&lt;endif&gt;&gt;&lt;/div&gt;
+        &lt;h2 class=&quot;yuqing-hero__title&quot;&gt;&lt;&lt;print _currentStory.title&gt;&gt;&lt;/h2&gt;
+        &lt;p class=&quot;yuqing-hero__summary&quot;&gt;&lt;&lt;print _currentStory.summary&gt;&gt;&lt;/p&gt;
+        &lt;&lt;if _currentStory.passages and _currentStory.passages.length&gt;&gt;
+        &lt;ul class=&quot;yuqing-hero__path&quot;&gt;
+          &lt;&lt;for _node range _currentStory.passages&gt;&gt;
+            &lt;li class=&quot;yuqing-hero__node&quot;&gt;&lt;&lt;print _node&gt;&gt;&lt;/li&gt;
+          &lt;&lt;/for&gt;&gt;
+        &lt;/ul&gt;
+        &lt;&lt;else&gt;&gt;
+        &lt;p class=&quot;yuqing-hero__meta&quot;&gt;提示：可在 StoryInit 中填写 passages 字段展示节点流程。&lt;/p&gt;
+        &lt;&lt;endif&gt;&gt;
+        &lt;button class=&quot;yuqing-hero__start&quot; data-start=&quot;&lt;&lt;print _currentStory.startPassage&gt;&gt;&quot;&gt;进入本期剧本&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+    &lt;section class=&quot;yuqing-archive&quot;&gt;
+      &lt;h2&gt;往期剧本&lt;/h2&gt;
+      &lt;&lt;if _archives.length == 0&gt;&gt;
+        &lt;p class=&quot;yuqing-archive__empty&quot;&gt;暂无其他剧本，添加后会自动显示在此处。&lt;/p&gt;
+      &lt;&lt;else&gt;&gt;
+      &lt;ul class=&quot;yuqing-archive__list&quot;&gt;
+        &lt;&lt;for _item range _archives&gt;&gt;
+        &lt;li class=&quot;yuqing-archive__item&quot; data-story-id=&quot;&lt;&lt;print _item.id&gt;&gt;&quot;&gt;
+          &lt;div class=&quot;yuqing-archive__title&quot;&gt;&lt;&lt;print _item.title&gt;&gt;&lt;/div&gt;
+          &lt;&lt;if _item.release&gt;&gt;
+          &lt;div class=&quot;yuqing-archive__meta&quot;&gt;发布日期：&lt;&lt;print _item.release&gt;&gt;&lt;/div&gt;
+          &lt;&lt;endif&gt;&gt;
+          &lt;div class=&quot;yuqing-archive__meta&quot;&gt;点击切换到该剧本&lt;/div&gt;
+        &lt;/li&gt;
+        &lt;&lt;/for&gt;&gt;
+      &lt;/ul&gt;
+      &lt;&lt;endif&gt;&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;&lt;endif&gt;&gt;
+
+&lt;&lt;script&gt;&gt;
+(function () {
+  $(document).one(':passagedisplay', function () {
+    var defaultBg = setup.getAsset('yuqingBackground', '');
+    $('.yuqing-screen').each(function () {
+      var custom = $(this).data('bg');
+      var chosen = (typeof custom === 'string' && custom.trim().length) ? custom : defaultBg;
+      $(this).css('--yuqing-bg-image', chosen ? 'url(' + chosen + ')' : 'none');
+    });
+
+    var defaultCover = setup.getAsset('yuqingDefaultCover', '');
+    $('.yuqing-hero').each(function () {
+      var $hero = $(this);
+      var cover = $hero.data('cover');
+      if (typeof cover !== 'string' || !cover.trim().length) {
+        cover = defaultCover;
+      }
+      $hero.find('.yuqing-hero__cover').css('background-image', cover ? 'url(' + cover + ')' : 'none');
+    });
+
+    $('.yuqing-hero__start').on('click', function () {
+      var passage = $(this).data('start');
+      if (passage) {
+        Engine.play(passage);
+      }
+    });
+
+    $('.yuqing-archive__item').on('click', function () {
+      var id = $(this).data('story-id');
+      if (id) {
+        State.variables.currentYuqingStoryId = id;
+        Engine.play('舆情游戏菜单');
+      }
+    });
+  });
+})();
+&lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="21" name="舆情剧本框架" tags="" position="820,320" size="100,100">&lt;!-- 舆情剧本模板：只需修改 _scenes 数组即可换剧情与图片 --&gt;
+&lt;&lt;set _scenes = [
+  {
+    speaker: '应对专员',
+    text: '监测大屏提示：本地社交平台正快速扩散“公司产品安全隐患”的讨论，你负责召集初步研判。',
+    stands: { left: setup.getAsset('novelLeftStand', '') },
+    background: setup.getAsset('novelDefaultBackground', ''),
+    nextLabel: '继续'
+  },
+  {
+    speaker: '舆情分析师',
+    text: '监测显示 12 分钟内关联帖子增长 180%，涉及 KOL 账号 4 个，话题有向行业论坛蔓延趋势。是否同步至指挥群？',
+    side: 'right',
+    stand: setup.getAsset('novelRightStand', ''),
+    background: setup.getAsset('novelDefaultBackground', ''),
+    nextLabel: '判断'
+  },
+  {
+    speaker: '系统提示',
+    text: '请选择下一步行动（仅为示例，可在数组中自由增删场景与选项）。',
+    choices: [
+      { text: '回到剧本菜单', passage: '舆情游戏菜单' },
+      { text: '返回主菜单', passage: 'Main' }
+    ],
+    nextLabel: '回到菜单'
   }
+]&gt;&gt;
 
-  .yuqing-header h1 {
-    font-size: clamp(2rem, 4vw, 3rem);
-    margin: 0;
-    font-weight: 600;
-  }
-
-  .yuqing-header p {
-    margin: 0.5rem 0 0;
-    max-width: 62ch;
-    line-height: 1.7;
-    opacity: 0.8;
-  }
-
-  .yuqing-section-title {
-    margin: 3.5rem 0 1.5rem;
-    font-size: 1.2rem;
-    letter-spacing: 0.2em;
-    opacity: 0.7;
-  }
-
-  .story-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-  }
-
-  .story-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    padding: 2rem;
-    border-radius: 24px;
-    background: rgba(18, 32, 68, 0.75);
-    border: 1px solid rgba(112, 168, 255, 0.35);
-    box-shadow: 0 20px 45px rgba(5, 12, 28, 0.55);
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  }
-
-  .story-card::after {
-    content: &#x27;&#x27;;
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(135deg, rgba(98, 176, 255, 0.3), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .story-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 28px 60px rgba(10, 24, 54, 0.65);
-    border-color: rgba(130, 192, 255, 0.6);
-  }
-
-  .story-card:hover::after {
-    opacity: 1;
-  }
-
-  .story-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-    opacity: 0.75;
-  }
-
-  .story-title {
-    font-size: 1.4rem;
-    margin: 0;
-  }
-
-  .story-summary {
-    margin: 0;
-    line-height: 1.6;
-    font-size: 0.95rem;
-    opacity: 0.85;
-  }
-
-  .story-path {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
-  .story-node {
-    padding: 0.35rem 0.75rem;
-    border-radius: 999px;
-    background: rgba(70, 120, 255, 0.25);
-    border: 1px solid rgba(110, 170, 255, 0.4);
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-  }
-
-  .archive {
-    margin-top: 3rem;
-    background: rgba(10, 18, 38, 0.75);
-    border-radius: 20px;
-    border: 1px solid rgba(88, 140, 220, 0.3);
-    padding: 1.6rem 2rem;
-  }
-
-  .archive summary {
-    cursor: pointer;
-    font-size: 1.1rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .archive-grid {
-    margin-top: 1.5rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .archive-item {
-    padding: 1.5rem;
-    border-radius: 18px;
-    background: rgba(18, 32, 68, 0.6);
-    border: 1px solid rgba(112, 168, 255, 0.25);
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    cursor: pointer;
-  }
-
-  .archive-item:hover {
-    transform: translateY(-4px);
-    border-color: rgba(130, 192, 255, 0.55);
-  }
-
-  .empty-hint {
-    margin: 1rem 0 0;
-    opacity: 0.65;
-  }
-
-  @media (max-width: 720px) {
-    .yuqing-screen {
-      padding: 4vh 1.5rem 6vh;
-    }
-
-    .story-card {
-      padding: 1.6rem;
-    }
-  }
-&lt;/style&gt;
-
-&lt;div class=&quot;yuqing-screen&quot;&gt;
-  &lt;header class=&quot;yuqing-header&quot;&gt;
-    &lt;h1&gt;舆情游戏剧本库&lt;/h1&gt;
-    &lt;p&gt;最新剧本将优先展示在下方两个焦点卡片中，其余内容收录于往期剧本档案，便于团队复盘与培训。&lt;/p&gt;
-  &lt;/header&gt;
-
-  &lt;p class=&quot;yuqing-section-title&quot;&gt;最新剧本&lt;/p&gt;
-  &lt;section class=&quot;story-grid&quot; id=&quot;latest-story-grid&quot;&gt;
-    &lt;!-- 最新剧本卡片将通过下面的脚本注入 --&gt;
-  &lt;/section&gt;
-
-  &lt;div class=&quot;archive&quot;&gt;
-    &lt;details&gt;
-      &lt;summary&gt;往期剧本&lt;/summary&gt;
-      &lt;div class=&quot;archive-grid&quot; id=&quot;archive-story-grid&quot;&gt;&lt;/div&gt;
-    &lt;/details&gt;
+&lt;div class=&quot;novel-stage&quot; id=&quot;yuqingNovelStage&quot;&gt;
+  &lt;div class=&quot;novel-standing novel-standing--left&quot; data-role=&quot;stand-left&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;novel-standing novel-standing--right&quot; data-role=&quot;stand-right&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;novel-stage__inner&quot;&gt;
+    &lt;div class=&quot;novel-dialog&quot;&gt;
+      &lt;div class=&quot;novel-dialog__name&quot; data-role=&quot;speaker&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;novel-dialog__text&quot; data-role=&quot;text&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;novel-choices&quot; data-role=&quot;choices&quot;&gt;&lt;/div&gt;
+      &lt;button class=&quot;novel-dialog__next&quot; data-role=&quot;next&quot;&gt;下一段&lt;/button&gt;
+      &lt;div class=&quot;novel-helper&quot; data-role=&quot;helper&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 
 &lt;&lt;script&gt;&gt;
 (function () {
-  /* 根据 StoryInit 中维护的 State.variables.yuqingStories 构建菜单。
-   * 每个剧本对象结构：
-   *   { id, title, summary, startPassage, passages, release }
-   * - startPassage: 点击剧本卡片后 Engine.play 的目标入口。
-   * - passages: 展示节点串联顺序，可根据实际剧情更新。 */
-  $(document).one(&#x27;:passagedisplay&#x27;, function () {
-    var stories = State.variables.yuqingStories || [];
-    var latest = stories.slice(0, 2);
-    var archive = stories.slice(2);
-
-    var latestContainer = $(&#x27;#latest-story-grid&#x27;);
-    var archiveContainer = $(&#x27;#archive-story-grid&#x27;);
-
-    if (!latest.length) {
-      latestContainer.append(&#x27;&lt;p class=&quot;empty-hint&quot;&gt;暂无最新剧本，敬请期待新内容上线。&lt;/p&gt;&#x27;);
-    }
-
-    latest.forEach(function (story) {
-      latestContainer.append(renderStoryCard(story, &#x27;story-card&#x27;));
-    });
-
-    if (!archive.length) {
-      archiveContainer.append(&#x27;&lt;p class=&quot;empty-hint&quot;&gt;暂无往期剧本。&lt;/p&gt;&#x27;);
-    } else {
-      archive.forEach(function (story) {
-        archiveContainer.append(renderStoryCard(story, &#x27;archive-item&#x27;));
-      });
-    }
-
-    $(&#x27;[data-start]&#x27;).on(&#x27;click&#x27;, function () {
-      var target = $(this).data(&#x27;start&#x27;);
-      if (target) {
-        Engine.play(target);
-      }
+  $(document).one(':passagedisplay', function () {
+    setup.NovelPlayer.mount('yuqingNovelStage', _scenes, {
+      endPassage: '舆情游戏菜单',
+      endButtonLabel: '回到剧本菜单'
     });
   });
-
-  function renderStoryCard(story, baseClass) {
-    var passages = Array.isArray(story.passages) ? story.passages : [];
-    var nodeHtml = passages.length
-      ? &#x27;&lt;ul class=&quot;story-path&quot;&gt;&#x27; + passages.map(function (name) {
-          return &#x27;&lt;li class=&quot;story-node&quot;&gt;&#x27; + name + &#x27;&lt;/li&gt;&#x27;;
-        }).join(&#x27;&#x27;) + &#x27;&lt;/ul&gt;&#x27;
-      : &#x27;&#x27;;
-
-    var release = story.release
-      ? &#x27;&lt;div class=&quot;story-meta&quot;&gt;&lt;span&gt;发布日期&lt;/span&gt;&lt;span&gt;&#x27; + story.release + &#x27;&lt;/span&gt;&lt;/div&gt;&#x27;
-      : &#x27;&#x27;;
-
-    return [
-      &#x27;&lt;article class=&quot;&#x27; + baseClass + &#x27;&quot; data-start=&quot;&#x27; + (story.startPassage || &#x27;&#x27;) + &#x27;&quot;&gt;&#x27;,
-      release ? &#x27;  &#x27; + release : &#x27;&#x27;,
-      &#x27;  &lt;h2 class=&quot;story-title&quot;&gt;&#x27; + (story.title || &#x27;未命名剧本&#x27;) + &#x27;&lt;/h2&gt;&#x27;,
-      story.summary ? &#x27;  &lt;p class=&quot;story-summary&quot;&gt;&#x27; + story.summary + &#x27;&lt;/p&gt;&#x27; : &#x27;&#x27;,
-      nodeHtml,
-      &#x27;&lt;/article&gt;&#x27;
-    ].filter(Boolean).join(&#x27;
-&#x27;);
-  }
 })();
 &lt;&lt;/script&gt;&gt;</tw-passagedata><tw-passagedata pid="19" name="Login" tags="" position="700,100" size="100,100">&lt;div class=&quot;app-viewport app-viewport--login&quot;&gt;
   &lt;div class=&quot;app-viewport__inner login-layout&quot;&gt;
