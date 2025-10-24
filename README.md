@@ -57,8 +57,8 @@
   - 每个 Passage 初始化时，若命中关键节点或结局，调用 `logEvent(type,label,passage)` 上报。
 
 ### 3.5 登录与会话
-- `setup.tryLogin(u,p,tipEl)`：POST `/api/auth.php` 成功后：
-  - `State.variables.user = username` 并写入 `localStorage('tw_user')`；
+- `setup.tryLogin(u,p,tipEl)`：POST `/api/auth.php`（飞书多维表格认证）成功后：
+  - 取后端返回的 `displayName || username` 写入 `State.variables.user` 与 `localStorage('tw_user')`；
   - 渲染水印 `setup.renderWatermark()`；
   - 跳转到 `MENU_PASSAGE` 或 `Main`。
 - `<<logout>>` 宏：清理登录状态并回到 Login。
@@ -73,8 +73,12 @@
 
 ### 4.1 登录 `POST /api/auth.php`
 - 入参：`{ "username": string, "password": string }`（JSON）。
-- 返回：`{ ok: true, user: { id, username } }` 或错误码（`invalid_credentials` 等）。
-- 附带：`GET ?ping=1` 快速自测。
+- 服务端：调用飞书多维表格（app_token=`RGk2bAFnvakyPWs7Uhlc05sbnoe`，用户表 `tbltiM3U0f6O97SP`，视图 `vewQOELBge`）检索账号；支持明文或 `password_hash()` 存储的口令。
+- 返回：`{ ok: true, user: { id: record_id, username, displayName } }` 或错误码（`invalid_credentials` 等）。
+- 依赖环境变量：
+  - `FEISHU_APP_SECRET`（必填，用于换取 tenant_access_token；亦兼容 `LARK_APP_SECRET`/`APP_SECRET`）。
+  - 可选覆盖：`FEISHU_APP_TOKEN`、`FEISHU_USER_TABLE`、`FEISHU_USER_VIEW`、`FEISHU_USERNAME_FIELD`、`FEISHU_PASSWORD_FIELD`、`FEISHU_DISPLAY_FIELD`。
+- 附带：`GET ?ping=1` 快速自测；需启用 PHP cURL 扩展。
 
 ### 4.2 事件上报 `POST /api/log.php`
 - 入参（JSON）：`token(≤64)`, `name(≤64)`, `type(≤16 ∈ start|node|ending|choice)`, `label(≤128)`, `passage(≤128)`。
@@ -86,6 +90,7 @@
 ### 4.3 数据库连接 `api/db.php`
 - PDO MySQL，显式设置 `ERRMODE_EXCEPTION / FETCH_ASSOC / 禁用模拟预处理`。
 - 先尝试容器内主机；失败再尝试外部地址作为兜底。**请勿将真实凭据提交到公开仓库**。
+- 备注：登录鉴权已切换至飞书多维表格，数据库仍用于事件打点等业务表。
 
 ### 4.4 工具脚本
 - `dbcheck.php`：输出当前连接信息（用于部署核对）。
@@ -140,6 +145,7 @@
 ---
 
 ## 8) 变更记录 / 进度
+- **v0.2（2025-10-25）** 登录改接飞书多维表格；首页/登录页 16:9 视觉重构与交互优化。
 - **v0.1（2025-10-24）** 建立 Codex 协作基线文档：项目结构梳理、接口契约、固定提示词模板。
 
 > **维护约定**：每次完成一轮需求，请在此处追加版本号、日期与要点（同时将“本次需求”粘回到上方模板供下一轮迭代）。
@@ -148,7 +154,7 @@
 
 ## 9) 本地自测清单（提交前必跑）
 - [ ] 浏览器控制台无报错；Twine 运行页面可进入 Login。
-- [ ] 输入已存在用户（见 `seed_users.php` 或后台数据）→ 登录成功，出现水印。
+- [ ] 输入飞书多维表格（用户表 `tbltiM3U0f6O97SP`）中存在的账号 → 登录成功，出现水印。
 - [ ] 进入 Main / 普通 Passage，无异常；关键 Passage 触发上报。
 - [ ] `/admin` 可按 type/q 筛选到最新记录。
 - [ ] 将改后的 `index.html` 导入 Twine → 正常显示结构与 Passages。
@@ -156,5 +162,6 @@
 ---
 
 ### 附注：安全与配置
-- 生产环境请改为**环境变量**管理数据库凭据；仓库内避免明文。  
+- 生产环境请改为**环境变量**管理数据库凭据；仓库内避免明文。
+- 飞书多维表格应用密钥同样通过环境变量（如 `FEISHU_APP_SECRET`）注入，禁止写入仓库。
 - 若需跨域部署，请在后端完善允许域名白名单策略。
