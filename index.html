@@ -106,6 +106,7 @@ var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZa
 	</div>
 	<tw-storydata name="保密加强版" startnode="19" creator="Twine" creator-version="2.10.0" format="SugarCube" format-version="2.37.3" ifid="1bee8df6-0f8d-4f00-a6fe-1992db6a998e" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">/* 隐藏 SugarCube 侧栏与切换按钮 */
 #ui-bar, #ui-bar-toggle { display: none !important; }
+#story-title, #story-caption { display: none !important; }
 /* 去掉左侧空白 */
 #story { margin-left: 0 !important; }
 /* 若出现回退元素，屏蔽 */
@@ -518,8 +519,8 @@ Config.saves.maxSlotSaves = 0;
 
 /* ========= 登录页背景 & 水印：集中可调参数（改这里就行） ========= */
 // 登录/全局背景图（相对/绝对路径皆可）
-setup.LoginBG_URL = 'assets/img/封面.jpg';
-setup.AppBG_URL = 'assets/img/封面.jpg';
+setup.LoginBG_URL = '';
+setup.AppBG_URL = '';
 
 // 水印参数：按需调整（透明度/密度/字号/颜色）
 setup.WM = {
@@ -563,6 +564,8 @@ setup.KeyTrack = {
 
   // 仅在已登录情况下，故事就绪时打一次 start
   $(document).one(':storyready', function () {
+    var title = document.getElementById('story-title'); if (title) { title.remove(); }
+    var caption = document.getElementById('story-caption'); if (caption) { caption.remove(); }
     if (localStorage.getItem('tw_user')) {
       logEvent('start', 'enter', 'StoryStart');
     }
@@ -603,8 +606,6 @@ setup.tryLogin = function (u, p, tipEl) {
   };
 
   if (!u || !p) { tip('请输入账号和密码'); return Promise.resolve(false); }
-
-  tip('正在验证...');
 
   tip('正在验证...');
 
